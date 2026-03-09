@@ -1,3 +1,7 @@
+// https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbxix2FPmx7VsDnxol37X3Xhd5phrJBn9pI3qdSBHulvA797aVN87EuBUbnKgFJOxPFO/exec
+
+
+https://script.google.com/macros/s/AKfycbxix2FPmx7VsDnxol37X3Xhd5phrJBn9pI3qdSBHulvA797aVN87EuBUbnKgFJOxPFO/exec
 
 <!DOCTYPE html>
 <html lang="id">
@@ -6,6 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
     <title>Demo SiDiMAS</title>
     <link rel="icon" type="image/png" href="./imgsidimas.png">
+
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -150,7 +155,7 @@ input, button, select, textarea {
       <div class="text-center mb-4"><h4 class="fw-bold">SiDiMAS</h4><div class="badge bg-warning text-dark rounded-pill px-3" id="lblRole">Role</div></div>
       <ul class="nav flex-column">
         <li class="nav-item"><a class="nav-link active" onclick="nav('home', this)"><i class="fas fa-chart-pie"></i>Dashboard</a></li>
-        <li class="nav-item"><a class="nav-link text-white bg-success bg-opacity-25" onclick="nav('buat', this)"><i class="fas fa-file-word"></i>Buat Surat</a></li>
+        <li class="nav-item non-kepsek"><a class="nav-link text-white bg-success bg-opacity-25" onclick="nav('buat', this)"><i class="fas fa-file-word"></i>Buat Surat</a></li>
         <li class="nav-item"><a class="nav-link" onclick="nav('masuk', this)"><i class="fas fa-inbox"></i>Surat Masuk</a></li>
         <li class="nav-item"><a class="nav-link" onclick="nav('keluar', this)"><i class="fas fa-paper-plane"></i>Surat Keluar</a></li>
         <li class="nav-item admin-only"><a class="nav-link text-warning fw-bold" onclick="nav('verifikasi', this)"><i class="fas fa-clipboard-check"></i>Verifikasi Surat</a></li>
@@ -409,7 +414,7 @@ input, button, select, textarea {
     <a class="nav-item-mobile" onclick="nav('masuk', this)">
         <i class="fas fa-inbox"></i><span>Srt Masuk</span>
     </a>
-    <a class="nav-item-mobile btn-buat-surat" onclick="nav('buat', this)">
+    <a class="nav-item-mobile btn-buat-surat non-kepsek" onclick="nav('buat', this)">
         <div class="icon-wrapper"><i class="fas fa-magic"></i></div><span>Buat Surat</span>
     </a>
     <a class="nav-item-mobile" onclick="nav('keluar', this)">
@@ -456,7 +461,15 @@ input, button, select, textarea {
       </div>
   </div>
 
-  <div class="modal fade" id="modalUser" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">User</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form onsubmit="submitUser(event)"><input type="hidden" name="mode" id="uMode"><input type="hidden" name="oldUsername" id="uOld"><div class="mb-2"><label>Username</label><input name="username" id="uName" class="form-control" required></div><div class="mb-2"><label>Password</label><input name="password" id="uPass" class="form-control" required></div><div class="mb-2"><label>Role</label><select name="role" id="uRole" class="form-select"><option value="Admin">Admin</option><option value="User">User</option></select></div><div class="mb-3"><label>Nama Lengkap</label><input name="nama" id="uFull" class="form-control" required></div><button class="btn btn-success w-100">Simpan</button></form></div></div></div></div>
+  <div class="modal fade" id="modalUser" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">User</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form onsubmit="submitUser(event)"><input type="hidden" name="mode" id="uMode"><input type="hidden" name="oldUsername" id="uOld"><div class="mb-2"><label>Username</label><input name="username" id="uName" class="form-control" required></div><div class="mb-2"><label>Password</label><input name="password" id="uPass" class="form-control" required></div><div <div class="mb-2">
+    <label>Role</label>
+    <select name="role" id="uRole" class="form-select">
+        <option value="Admin">Admin</option>
+        <option value="User">User</option>
+        <option value="Kepsek">Kepsek</option>
+    </select>
+</div>
+<div class="mb-3"><label>Nama Lengkap</label><input name="nama" id="uFull" class="form-control" required></div><button class="btn btn-success w-100">Simpan</button></form></div></div></div></div>
   
   <div class="modal fade" id="modalPrivasi" tabindex="-1">
       <div class="modal-dialog">
@@ -670,13 +683,21 @@ input, button, select, textarea {
       $('#view-login').addClass('hide').css('display', 'none'); 
       $('#view-dashboard').removeClass('hide');
       $('#lblRole').text(role); $('#lblNama').text(nama);
-      if (role === 'Admin') { 
-          $('.admin-only').show(); $('.user-only').hide(); $('.kepsek-only').hide();
-      } else if (role === 'Kepsek') {
-          $('.admin-only').hide(); $('.user-only').hide(); $('.kepsek-only').show();
-          // Sembunyikan menu lain yang tidak perlu untuk Kepsek jika mau
-      } else { 
-          $('.admin-only').hide(); $('.kepsek-only').hide(); $('.user-only').show(); 
+      // LOGIKA HAK AKSES MENU
+      if (role === 'Kepsek') { 
+          $('.admin-only').hide(); 
+          $('.non-kepsek').hide(); // Sembunyikan menu Buat Surat
+          $('.kepsek-only').show(); 
+      } 
+      else if (role === 'Admin') {
+          $('.admin-only').show(); 
+          $('.non-kepsek').show(); 
+          $('.kepsek-only').hide();
+      } 
+      else { // Jika yang login adalah Staf/User biasa
+          $('.admin-only').hide(); 
+          $('.kepsek-only').hide(); 
+          $('.non-kepsek').show(); 
       }
       if($('#view-dashboard').is(':visible') && $('.nav-link.active').length === 0) { nav('home'); }
     } else { 
