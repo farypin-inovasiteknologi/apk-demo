@@ -155,7 +155,7 @@ input, button, select, textarea {
         <li class="nav-item"><a class="nav-link" onclick="nav('masuk', this)"><i class="fas fa-inbox"></i>Surat Masuk</a></li>
         <li class="nav-item"><a class="nav-link" onclick="nav('keluar', this)"><i class="fas fa-paper-plane"></i>Surat Keluar</a></li>
         <li class="nav-item admin-only"><a class="nav-link text-warning fw-bold" onclick="nav('verifikasi', this)"><i class="fas fa-clipboard-check"></i>Verifikasi Surat</a></li>
-        <li class="nav-item kepsek-only hide"><a class="nav-link text-success fw-bold" onclick="nav('ttd', this)"><i class="fas fa-qrcode"></i>Tanda Tangan Surat</a></li>
+        <li class="nav-item kepsek-only"><a class="nav-link text-success fw-bold" onclick="nav('ttd', this)"><i class="fas fa-qrcode"></i>TTE Surat</a></li>
         <li class="nav-item admin-only"><a class="nav-link" onclick="nav('users', this)"><i class="fas fa-users"></i>Manajemen User</a></li>
         <li class="nav-item admin-only"><a class="nav-link" onclick="nav('setting', this)"><i class="fas fa-cogs"></i>Settings</a></li>
         <li class="nav-item mt-5"><a class="nav-link text-white" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
@@ -410,15 +410,24 @@ input, button, select, textarea {
     <a class="nav-item-mobile" onclick="nav('masuk', this)">
         <i class="fas fa-inbox"></i><span>Srt Masuk</span>
     </a>
+    
     <a class="nav-item-mobile btn-buat-surat non-kepsek" onclick="nav('buat', this)">
         <div class="icon-wrapper"><i class="fas fa-magic"></i></div><span>Buat Surat</span>
     </a>
+    
+    <a class="nav-item-mobile btn-buat-surat kepsek-only" onclick="nav('ttd', this)">
+        <div class="icon-wrapper" style="background: linear-gradient(135deg, #198754, #20c997);"><i class="fas fa-qrcode"></i></div><span>TTE Surat</span>
+    </a>
+
     <a class="nav-item-mobile" onclick="nav('keluar', this)">
         <i class="fas fa-paper-plane"></i><span>Srt Keluar</span>
     </a>
     
-    <a class="nav-item-mobile text-warning admin-only hide" onclick="nav('verifikasi', this)">
+    <a class="nav-item-mobile text-warning admin-only" onclick="nav('verifikasi', this)">
         <i class="fas fa-clipboard-check"></i><span>Verifikasi</span>
+    </a>
+    <a class="nav-item-mobile text-danger non-admin" onclick="doLogout()">
+        <i class="fas fa-sign-out-alt"></i><span>Logout</span>
     </a>
 </div>
 </div>
@@ -502,7 +511,7 @@ input, button, select, textarea {
   <script>
   /* --- KONFIGURASI API (URL DARI GOOGLE APPS SCRIPT) --- */
   // NANTI GANTI LINK DI BAWAH INI DENGAN LINK HASIL DEPLOY APPS SCRIPT KAMU
-  const API_URL = "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbxix2FPmx7VsDnxol37X3Xhd5phrJBn9pI3qdSBHulvA797aVN87EuBUbnKgFJOxPFO/exec"; 
+  const API_URL = " https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbxix2FPmx7VsDnxol37X3Xhd5phrJBn9pI3qdSBHulvA797aVN87EuBUbnKgFJOxPFO/exec"; 
 
   /* --- FUNGSI JEMBATAN PENGHUBUNG (FETCH API) --- */
   async function apiCall(actionName, payloadData = {}) {
@@ -681,19 +690,22 @@ input, button, select, textarea {
       $('#lblRole').text(role); $('#lblNama').text(nama);
       // LOGIKA HAK AKSES MENU
       if (role === 'Kepsek') { 
-          $('.admin-only').hide(); 
-          $('.non-kepsek').hide(); // Sembunyikan menu Buat Surat
-          $('.kepsek-only').show(); 
+          $('.admin-only').removeClass('hide').hide(); 
+          $('.non-kepsek').removeClass('hide').hide(); // Sembunyikan Buat Surat
+          $('.kepsek-only').removeClass('hide').show(); // Tampilkan TTE
+          $('.non-admin').removeClass('hide').show(); // Tampilkan Logout di bawah
       } 
       else if (role === 'Admin') {
-          $('.admin-only').show(); 
-          $('.non-kepsek').show(); 
-          $('.kepsek-only').hide();
+          $('.admin-only').removeClass('hide').show(); 
+          $('.non-kepsek').removeClass('hide').show(); 
+          $('.kepsek-only').removeClass('hide').hide();
+          $('.non-admin').removeClass('hide').hide(); // Admin logout di atas
       } 
-      else { // Jika yang login adalah Staf/User biasa
-          $('.admin-only').hide(); 
-          $('.kepsek-only').hide(); 
-          $('.non-kepsek').show(); 
+      else { // Staf/User biasa
+          $('.admin-only').removeClass('hide').hide(); 
+          $('.kepsek-only').removeClass('hide').hide(); 
+          $('.non-kepsek').removeClass('hide').show(); 
+          $('.non-admin').removeClass('hide').show(); // Tampilkan Logout di bawah
       }
       if($('#view-dashboard').is(':visible') && $('.nav-link.active').length === 0) { nav('home'); }
     } else { 
