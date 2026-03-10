@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-    <title>Demo SiDiMAS</title>
+    <title>Demo SiDiMAS TTE</title>
     <link rel="icon" type="image/png" href="./imgsidimas.png">
 
 
@@ -140,12 +140,10 @@ input, button, select, textarea {
   <div id="view-dashboard" class="hide">
   <div class="d-md-none bg-primary text-white p-3 d-flex align-items-center justify-content-between shadow-sm sticky-top" style="z-index: 1040;">
    <div class="fw-bold fs-5">SiDiMAS</div>
-   <div class="admin-only hide"> 
-       <div class="d-flex gap-3 align-items-center">
-           <a onclick="nav('users', this)" class="text-white" title="Manajemen User"><i class="fas fa-users-cog fa-lg"></i></a>
-           <a onclick="nav('setting', this)" class="text-white" title="Pengaturan"><i class="fas fa-tools fa-lg"></i></a>
-           <a onclick="doLogout()" class="text-danger bg-white rounded-circle p-1 shadow-sm" title="Logout" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-power-off"></i></a>
-       </div>
+   <div class="d-flex gap-3 align-items-center">
+       <a onclick="nav('users', this)" class="text-white admin-only hide" title="Manajemen User"><i class="fas fa-users-cog fa-lg"></i></a>
+       <a onclick="nav('setting', this)" class="text-white admin-only hide" title="Pengaturan"><i class="fas fa-tools fa-lg"></i></a>
+       <a onclick="doLogout()" class="text-danger bg-white rounded-circle p-1 shadow-sm non-kepsek hide" title="Logout" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-power-off"></i></a>
    </div>
 </div>
 
@@ -157,6 +155,7 @@ input, button, select, textarea {
         <li class="nav-item"><a class="nav-link" onclick="nav('masuk', this)"><i class="fas fa-inbox"></i>Surat Masuk</a></li>
         <li class="nav-item"><a class="nav-link" onclick="nav('keluar', this)"><i class="fas fa-paper-plane"></i>Surat Keluar</a></li>
         <li class="nav-item admin-only"><a class="nav-link text-warning fw-bold" onclick="nav('verifikasi', this)"><i class="fas fa-clipboard-check"></i>Verifikasi Surat</a></li>
+        <li class="nav-item user-only hide"><a class="nav-link text-info fw-bold" onclick="nav('hasil', this)"><i class="fas fa-file-export"></i>Hasil Surat</a></li>
         <li class="nav-item kepsek-only"><a class="nav-link text-success fw-bold" onclick="nav('ttd', this)"><i class="fas fa-qrcode"></i>TTE Surat</a></li>
         <li class="nav-item admin-only"><a class="nav-link" onclick="nav('users', this)"><i class="fas fa-users"></i>Manajemen User</a></li>
         <li class="nav-item admin-only"><a class="nav-link" onclick="nav('setting', this)"><i class="fas fa-cogs"></i>Settings</a></li>
@@ -363,6 +362,19 @@ input, button, select, textarea {
               </div>
           </div>
       </div>
+
+      <div id="page-hasil" class="page-view hide">
+          <div class="card p-3 shadow-sm border-0 border-top border-info border-4">
+              <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                  <h5 class="text-info mb-0"><i class="fas fa-file-export me-2"></i>Surat Siap Cetak</h5>
+                  <button class="btn btn-light btn-sm btn-refresh text-info" onclick="refreshHasil()" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+              </div>
+              <div class="alert alert-info py-2 small">Daftar surat yang dikembalikan oleh Admin untuk dicetak dan diajukan TTD basah.</div>
+              <div class="table-responsive">
+                  <table id="tHasil" class="table table-striped table-bordered w-100 table-hover"></table>
+              </div>
+          </div>
+      </div>
       
       <div id="page-users" class="page-view hide"><div class="card shadow-sm border-0"><div class="card-header bg-primary text-white d-flex justify-content-between align-items-center"><h5 class="mb-0">Manajemen User</h5><button class="btn btn-light btn-sm btn-refresh text-primary" onclick="loadUsers()" title="Refresh"><i class="fas fa-sync-alt"></i></button></div><div class="card-body"><div class="mb-3"><button class="btn btn-success btn-sm" onclick="modalUser('add')"><i class="fas fa-plus"></i> Tambah User</button></div><div class="table-responsive"><table class="table table-bordered table-hover"><thead class="table-light"><tr><th>Username</th><th>Password</th><th>Role</th><th>Nama Lengkap</th><th>Aksi</th></tr></thead><tbody id="tbody-users"></tbody></table></div></div></div></div>
       
@@ -405,32 +417,22 @@ input, button, select, textarea {
       <div class="footer">&copy; 2026 SiDiMAS | All Right Reserved. <br> <a href="javascript:void(0)" onclick="modalPrivasi()">Kebijakan Privasi</a> | Created by : <a href='https://www.fary-edtech.my.id' target="_blank" style="color:blue">Fary EdTech</a></div>
     </div>
 
-    <div class="mobile-bottom-nav d-md-none">
-    <a class="nav-item-mobile active" onclick="nav('home', this)">
-        <i class="fas fa-chart-pie"></i><span>Dashboard</span>
-    </a>
-    <a class="nav-item-mobile" onclick="nav('masuk', this)">
-        <i class="fas fa-inbox"></i><span>Srt Masuk</span>
-    </a>
+   <div class="mobile-bottom-nav d-md-none">
+    <a class="nav-item-mobile active" onclick="nav('home', this)"><i class="fas fa-chart-pie"></i><span>Dashboard</span></a>
+    <a class="nav-item-mobile" onclick="nav('masuk', this)"><i class="fas fa-inbox"></i><span>Srt Masuk</span></a>
     
-    <a class="nav-item-mobile btn-buat-surat non-kepsek" onclick="nav('buat', this)">
+    <a class="nav-item-mobile btn-buat-surat non-kepsek hide" onclick="nav('buat', this)">
         <div class="icon-wrapper"><i class="fas fa-magic"></i></div><span>Buat Surat</span>
     </a>
-    
-    <a class="nav-item-mobile btn-buat-surat kepsek-only" onclick="nav('ttd', this)">
+    <a class="nav-item-mobile btn-buat-surat kepsek-only hide" onclick="nav('ttd', this)">
         <div class="icon-wrapper" style="background: linear-gradient(135deg, #198754, #20c997);"><i class="fas fa-qrcode"></i></div><span>TTE Surat</span>
     </a>
 
-    <a class="nav-item-mobile" onclick="nav('keluar', this)">
-        <i class="fas fa-paper-plane"></i><span>Srt Keluar</span>
-    </a>
+    <a class="nav-item-mobile" onclick="nav('keluar', this)"><i class="fas fa-paper-plane"></i><span>Srt Keluar</span></a>
     
-    <a class="nav-item-mobile text-warning admin-only" onclick="nav('verifikasi', this)">
-        <i class="fas fa-clipboard-check"></i><span>Verifikasi</span>
-    </a>
-    <a class="nav-item-mobile text-danger non-admin" onclick="doLogout()">
-        <i class="fas fa-sign-out-alt"></i><span>Logout</span>
-    </a>
+    <a class="nav-item-mobile text-warning admin-only hide" onclick="nav('verifikasi', this)"><i class="fas fa-clipboard-check"></i><span>Verifikasi</span></a>
+    <a class="nav-item-mobile text-info user-only hide" onclick="nav('hasil', this)"><i class="fas fa-file-export"></i><span>Hasil Surat</span></a>
+    <a class="nav-item-mobile text-danger kepsek-only hide" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
 </div>
 </div>
 
@@ -513,7 +515,7 @@ input, button, select, textarea {
   <script>
   /* --- KONFIGURASI API (URL DARI GOOGLE APPS SCRIPT) --- */
   // NANTI GANTI LINK DI BAWAH INI DENGAN LINK HASIL DEPLOY APPS SCRIPT KAMU
-  const API_URL = "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbzDrVY2hSxoungLjjP9LlXP4D3qqFU7ZcGRMF8-ru6OcO7oh42zRrzf3FkEksIwk3Ce/exec"; 
+  const API_URL = "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbx6a2w3nmWWsljUGfdMfY5gIzQh_5VknxMuYcqWgjuZW90M4ghFeCv7gXGNDXUxKKGL/exec"; 
 
   /* --- FUNGSI JEMBATAN PENGHUBUNG (FETCH API) --- */
   async function apiCall(actionName, payloadData = {}) {
@@ -692,22 +694,22 @@ input, button, select, textarea {
       $('#lblRole').text(role); $('#lblNama').text(nama);
       // LOGIKA HAK AKSES MENU
       if (role === 'Kepsek') { 
-          $('.admin-only').removeClass('hide').hide(); 
-          $('.non-kepsek').removeClass('hide').hide(); // Sembunyikan Buat Surat
-          $('.kepsek-only').removeClass('hide').show(); // Tampilkan TTE
-          $('.non-admin').removeClass('hide').show(); // Tampilkan Logout di bawah
+          $('.admin-only').addClass('hide'); 
+          $('.non-kepsek').addClass('hide'); 
+          $('.user-only').addClass('hide');
+          $('.kepsek-only').removeClass('hide');
       } 
       else if (role === 'Admin') {
-          $('.admin-only').removeClass('hide').show(); 
-          $('.non-kepsek').removeClass('hide').show(); 
-          $('.kepsek-only').removeClass('hide').hide();
-          $('.non-admin').removeClass('hide').hide(); // Admin logout di atas
+          $('.kepsek-only').addClass('hide');
+          $('.user-only').addClass('hide');
+          $('.admin-only').removeClass('hide'); 
+          $('.non-kepsek').removeClass('hide'); 
       } 
-      else { // Staf/User biasa
-          $('.admin-only').removeClass('hide').hide(); 
-          $('.kepsek-only').removeClass('hide').hide(); 
-          $('.non-kepsek').removeClass('hide').show(); 
-          $('.non-admin').removeClass('hide').show(); // Tampilkan Logout di bawah
+      else { // Staf
+          $('.admin-only').addClass('hide'); 
+          $('.kepsek-only').addClass('hide'); 
+          $('.user-only').removeClass('hide');
+          $('.non-kepsek').removeClass('hide'); 
       }
       if($('#view-dashboard').is(':visible') && $('.nav-link.active').length === 0) { nav('home'); }
     } else { 
@@ -885,6 +887,7 @@ input, button, select, textarea {
     if(p==='keluar') refreshTable('keluar');
     if(p==='verifikasi') refreshDrafts(); 
     if(p==='ttd') refreshKepsek();
+    if(p==='hasil') refreshHasil();
     if(p==='users') loadUsers(); 
     if(p==='buat') { loadAutoNumber(); }
   }
@@ -1046,7 +1049,7 @@ function refreshDrafts() {
     $('#tDraft').html('<tbody><tr><td colspan="6" class="text-center p-4"><div class="spinner-border text-warning"></div></td></tr></tbody>');
 
     const role = localStorage.getItem('sidimas_role');
-    apiCall('getDrafts', { role: role }).then(data => {
+    apiCall('getDrafts', { role: role, user: localStorage.getItem('sidimas_user') }).then(data => {
         const cols = [
             {title:"ID", data: "id", visible:false},
             {title:"Tgl Usulan", data: "wkt"},
@@ -1068,10 +1071,27 @@ function renderAksiDraft(id) {
     return `
     <div class="d-flex gap-1">
         <button class="btn btn-sm btn-info text-white" onclick="lihatPreview('${id}')" title="Pratinjau"><i class="fas fa-eye"></i></button>
-        <button class="btn btn-sm btn-danger" onclick="prosesDraft('${id}', 'Tolak')" title="Tolak / Hapus"><i class="fas fa-times"></i></button>
-        <button class="btn btn-sm btn-secondary" onclick="prosesDraft('${id}', 'CetakManual')" title="Cetak Manual"><i class="fas fa-print"></i></button>
-        <button class="btn btn-sm btn-success" onclick="prosesDraft('${id}', 'TeruskanTTE')" title="Teruskan ke Kepsek (TTE)"><i class="fas fa-check-double"></i></button>
+        <button class="btn btn-sm btn-danger" onclick="prosesDraft('${id}', 'Tolak')" title="Tolak"><i class="fas fa-times"></i></button>
+        <button class="btn btn-sm btn-secondary" onclick="opsiCetakAdmin('${id}')" title="Cetak"><i class="fas fa-print"></i></button>
+        <button class="btn btn-sm btn-success" onclick="prosesDraft('${id}', 'TeruskanTTE')" title="TTE"><i class="fas fa-check-double"></i></button>
     </div>`;
+}
+
+function opsiCetakAdmin(id) {
+    Swal.fire({
+        title: 'Opsi Cetak Surat',
+        text: 'Pilih tindakan untuk dokumen ini:',
+        icon: 'question',
+        showDenyButton: true, showCancelButton: true,
+        confirmButtonText: '<i class="fas fa-print"></i> Cetak Langsung (PDF/Word)',
+        confirmButtonColor: '#0d6efd',
+        denyButtonText: '<i class="fas fa-reply"></i> Cetak Oleh Staf (Kembalikan)',
+        denyButtonColor: '#6c757d',
+        cancelButtonText: 'Batal'
+    }).then((r) => {
+        if (r.isConfirmed) prosesDraft(id, 'CetakManual');
+        else if (r.isDenied) prosesDraft(id, 'KembalikanStaf');
+    });
 }
 
 function prosesDraft(id, aksi) {
@@ -1115,7 +1135,7 @@ function refreshKepsek() {
     $('#tKepsek').html('<tbody><tr><td colspan="5" class="text-center p-4"><div class="spinner-border text-success"></div></td></tr></tbody>');
 
     const role = localStorage.getItem('sidimas_role');
-    apiCall('getDrafts', { role: role }).then(data => {
+    apiCall('getDrafts', { role: role, user: localStorage.getItem('sidimas_user') }).then(data => {
         const cols = [
             {title:"ID", data: "id", visible:false},
             {title:"Tgl Usulan", data: "wkt"},
@@ -1123,8 +1143,9 @@ function refreshKepsek() {
             {title:"Nomor & Perihal", render: (d,t,r) => `<b>${r.no}</b><br>${r.perihal}`},
             {title:"Aksi", render: (d,t,r) => `
                 <div class="d-flex gap-1">
-                    <button class="btn btn-sm btn-info text-white fw-bold" onclick="lihatPreview('${r.id}')" title="Lihat Pratinjau"><i class="fas fa-eye"></i> Lihat</button>
-                    <button class="btn btn-sm btn-success fw-bold" onclick="prosesTtd('${r.id}')" title="Tanda Tangani"><i class="fas fa-pen-nib"></i> TTE</button>
+                    <button class="btn btn-sm btn-info text-white" onclick="lihatPreview('${r.id}')" title="Pratinjau"><i class="fas fa-eye"></i></button>
+                    <button class="btn btn-sm btn-warning" onclick="prosesDraft('${r.id}', 'KembalikanAdmin')" title="Kembalikan ke Admin"><i class="fas fa-reply"></i></button>
+                    <button class="btn btn-sm btn-success fw-bold" onclick="prosesTtd('${r.id}')" title="TTE"><i class="fas fa-pen-nib"></i></button>
                 </div>
             `}
         ];
@@ -1171,6 +1192,57 @@ function lihatPreview(id) {
             });
         } else {
             Swal.fire('Gagal', r.message, 'error');
+        }
+    });
+}
+
+function refreshHasil() {
+    if($.fn.DataTable.isDataTable('#tHasil')) { $('#tHasil').DataTable().destroy(); }
+    $('#tHasil').html('<tbody><tr><td colspan="5" class="text-center p-4"><div class="spinner-border text-info"></div></td></tr></tbody>');
+
+    const role = localStorage.getItem('sidimas_role');
+    const user = localStorage.getItem('sidimas_user');
+    apiCall('getDrafts', { role: role, user: user }).then(data => {
+        const cols = [
+            {title:"ID", data: "id", visible:false},
+            {title:"Disetujui Tanggal", data: "wkt"},
+            {title:"Nomor & Perihal", render: (d,t,r) => `<b>${r.no}</b><br>${r.perihal}`},
+           {title:"Aksi", render: (d,t,r) => `<button class="btn btn-sm btn-success fw-bold" onclick="unduhDokumenStaf('${r.id}')"><i class="fas fa-file-download"></i> Unduh Dokumen</button>`}
+        ];
+        $('#tHasil').DataTable({ data: data, columns: cols, scrollX: true, destroy: true, language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json" }, order: [[1,'asc']] });
+    });
+}
+
+function unduhDokumenStaf(id) {
+    Swal.fire({
+        title: 'Generate Dokumen?',
+        text: 'Sistem akan menyiapkan file PDF dan Word untuk Anda cetak secara manual. (Setelah digenerate, data akan otomatis hilang dari antrean ini).',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Siapkan File',
+        cancelButtonText: 'Batal'
+    }).then(res => {
+        if(res.isConfirmed) {
+            showLoadingTimer('Menyiapkan File PDF & Word...');
+            const role = localStorage.getItem('sidimas_role');
+            // Menggunakan rute CetakManual karena tujuannya sama: Generate tanpa TTE dan hapus draft
+            apiCall('aksiDraft', { id: id, aksi: 'CetakManual', role: role }).then(r => {
+                if(r.success) {
+                    Swal.fire({
+                        title: 'Dokumen Siap!',
+                        html: `<p class="text-muted small mb-3">Silakan klik kedua tombol di bawah ini untuk menyimpan file ke perangkat Anda:</p>
+                               <div class="d-flex justify-content-center gap-2">
+                                   <a href="${r.pdfUrl}" target="_blank" class="btn btn-danger btn-lg"><i class="fas fa-file-pdf"></i> Unduh PDF</a>
+                                   <a href="${r.wordUrl}" target="_blank" class="btn btn-primary btn-lg"><i class="fas fa-file-word"></i> Edit Word</a>
+                               </div>`,
+                        icon: 'success',
+                        allowOutsideClick: false // Mencegah user menutup popup tanpa sengaja sebelum klik tombol
+                    });
+                    refreshHasil(); // Refresh tabel agar surat yg sudah diproses hilang
+                } else {
+                    Swal.fire('Gagal', r.message, 'error');
+                }
+            });
         }
     });
 }
