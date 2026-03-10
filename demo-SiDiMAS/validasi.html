@@ -35,10 +35,10 @@
             
             <div class="logos">
                 <? if (data.logoInstansi && data.logoInstansi.length > 50) { ?>
-                    <img src="<?= data.logoInstansi ?>" alt="Logo Instansi">
+                    <img src="<?!= data.logoInstansi ?>" alt="Logo Instansi">
                 <? } ?>
                 <? if (data.logoSekolah && data.logoSekolah.length > 50) { ?>
-                    <img src="<?= data.logoSekolah ?>" alt="Logo Sekolah">
+                    <img src="<?!= data.logoSekolah ?>" alt="Logo Sekolah">
                 <? } ?>
             </div>
             
