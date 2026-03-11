@@ -204,24 +204,25 @@ input, button, select, textarea {
 </div>
 
 <div id="wrap-mode-upload" class="hide">
-    <div class="alert alert-warning border-warning">
+    <div class="alert alert-warning border-warning shadow-sm">
         <h6 class="fw-bold text-dark mb-2"><i class="fas fa-exclamation-circle text-danger me-2"></i> PETUNJUK TEMPLATE WORD:</h6>
         <ul class="small text-dark mb-0 ps-3">
-            <li>Gunakan font standar (Arial / Times New Roman). <strong>DILARANG</strong> pakai <i>Text Box</i>.</li>
-            <li>Ekstensi file wajib <b>.docx</b>.</li>
-            <li>Ketik kode wajib ini di dalam file Word Anda agar terisi otomatis:
+            <li>Gunakan font standar (Arial / Times New Roman / Calibri). <strong>DILARANG</strong> pakai <i>Text Box</i>.</li>
+            <li class="mt-1">Ekstensi file wajib <b>.docx</b>. 
+                <a href="https://docs.google.com/document/d/11WTENeTJM4P4RoLBQn-AeKlGyG0sH0is/edit?usp=sharing&ouid=112266553606369848980&rtpof=true&sd=true" target="_blank" class="badge bg-primary text-decoration-none ms-1 px-2 py-1"><i class="fas fa-download me-1"></i> Unduh Contoh Di Sini</a>
+            </li>
+            <li class="mt-1">Ketik kode wajib ini di dalam file Word Anda agar terisi otomatis:
                 <br><span class="badge bg-dark mt-1">{NOMOR_SURAT}</span> : Untuk letak Nomor Surat
                 <br><span class="badge bg-dark mt-1">{TEMPAT_TTD}</span> : Untuk Tempat ttd Surat
                 <br><span class="badge bg-dark mt-1">{TANGGAL_TTD}</span> : Untuk Tanggal Surat
-                <br><span class="badge bg-dark mt-1">{QR_TTE}</span> : Untuk letak posisi QR Code
+                <br><span class="badge bg-dark mt-1">{QR_TTE}</span> : letakkan di atas nama Kepsek (Sistem otomatis mengatur jaraknya, <b>jangan beri terlalu banyak Enter!</b>)
                 <br><span class="badge bg-dark mt-1">{TTD_NAMA}</span> : Untuk Nama Kepala Sekolah
                 <br><span class="badge bg-dark mt-1">{TTD_PANGKAT}</span> : Untuk Pangkat/Golongan
-                <br><span class="badge bg-dark mt-1">{TTD_NIP}</span> : Untuk NIP
-            </li>
+                <br><span class="badge bg-dark mt-1">{TTD_NIP}</span> : Untuk NIP Kepala Sekolah
         </ul>
         <hr>
-        <label class="fw-bold mb-1">Upload File Anda (.docx):</label>
-        <input type="file" id="fileUploadDocx" accept=".docx" class="form-control form-control-lg border-warning">
+        <label class="fw-bold mb-1 text-primary">Upload File Anda (.docx):</label>
+        <input type="file" id="fileUploadDocx" accept=".docx" class="form-control form-control-lg border-primary">
     </div>
     <input type="hidden" name="isUploadMode" id="isUploadMode" value="false">
 </div>
@@ -567,6 +568,7 @@ input, button, select, textarea {
   /* --- KONFIGURASI API (URL DARI GOOGLE APPS SCRIPT) --- */
   // NANTI GANTI LINK DI BAWAH INI DENGAN LINK HASIL DEPLOY APPS SCRIPT KAMU
   const API_URL = "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbyzA3WTfQ7aLRDK1YGGs8BmM_kDVCp_4Oq331mDSZiI4b-vW0dYaeKKByJisyVlkJEw/exec"; 
+  
 
   /* --- FUNGSI JEMBATAN PENGHUBUNG (FETCH API) --- */
   async function apiCall(actionName, payloadData = {}) {
