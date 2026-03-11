@@ -829,8 +829,16 @@
       if(viewId === 'view-status') $('#btn-nav-status').addClass('active');
     }
 
-    function navigasiKe(halaman) {
+    
+function navigasiKe(halaman) {
+      // --- TAMBAHAN BARU: CLEANUP SEGALA OVERLAY HITAM YANG NYANGKUT ---
+      $('.modal-backdrop').remove();
+      $('body').removeClass('modal-open swal2-shown swal2-height-auto').css({ 'padding-right': '', 'overflow': 'auto' });
+      $('#sidebar-overlay').removeClass('show');
+      // ----------------------------------------------------------------
+
       $('.app-wrapper').removeClass('active').hide();
+      
       if (halaman === 'login') {
           $('#wrapper-login').addClass('active').show();
       } else if (halaman === 'dashboard') {
@@ -857,7 +865,6 @@
       window.scrollTo(0,0);
     }
 
-    // --- LOGIN ---
     async function handleLogin(e) {
       e.preventDefault();
       const u = $('#user').val();
@@ -865,18 +872,28 @@
       showLoading();
       try {
         const res = await fetchAPI('loginAdmin', { user: u, pass: p });
-        if(!res.success) throw new Error(res.error); // FIX BUG 2: Validasi Error dari DB
+        if(!res.success) throw new Error(res.error); 
         
         CURRENT_TOKEN = res.token;
         sessionStorage.setItem('admToken', res.token);
         sessionStorage.setItem('admRole', res.akses); 
         $('#user').val(''); $('#pass').val('');
         
-        navigasiKe('dashboard'); // Redirect langsung bekerja normal
-        Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 3000}).fire({icon: 'success', title: 'Login Berhasil'});
+        navigasiKe('dashboard'); 
+        
+        // --- TAMBAHAN BARU: MATIKAN BACKDROP PADA NOTIFIKASI LOGIN ---
+        Swal.fire({
+           icon: 'success', 
+           title: 'Login Berhasil', 
+           showConfirmButton: false, 
+           timer: 1500,
+           backdrop: false // Mencegah munculnya bayangan hitam
+        });
       } catch (err) {
         showMsg('error', 'Gagal', err.message);
-      } finally { hideLoading(); }
+      } finally { 
+        hideLoading(); 
+      }
     }
 
     function logout() {
