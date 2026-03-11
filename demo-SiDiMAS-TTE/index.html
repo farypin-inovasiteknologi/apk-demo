@@ -205,16 +205,22 @@ input, button, select, textarea {
 
 <div id="wrap-mode-upload" class="hide">
     <div class="alert alert-warning border-warning">
-        <h6 class="fw-bold text-dark mb-2"><i class="fas fa-exclamation-circle text-danger me-2"></i> TIPS AGAR FORMAT TIDAK BERANTAKAN:</h6>
+        <h6 class="fw-bold text-dark mb-2"><i class="fas fa-exclamation-circle text-danger me-2"></i> PETUNJUK TEMPLATE WORD:</h6>
         <ul class="small text-dark mb-0 ps-3">
-            <li>Gunakan font standar (Arial / Times New Roman / Calibri).</li>
-            <li><strong>DILARANG</strong> memakai <i>Text Box</i> (Kotak Teks). Gunakan tabel transparan untuk menata posisi tanda tangan.</li>
-            <li>Pastikan ekstensi file wajib <b>.docx</b> (Bukan PDF atau .doc lama).</li>
+            <li>Gunakan font standar (Arial / Times New Roman). <strong>DILARANG</strong> pakai <i>Text Box</i>.</li>
+            <li>Ekstensi file wajib <b>.docx</b>.</li>
+            <li>Ketik kode wajib ini di dalam file Word Anda agar terisi otomatis:
+                <br><span class="badge bg-dark mt-1">{NOMOR_SURAT}</span> : Untuk letak Nomor Surat
+                <br><span class="badge bg-dark mt-1">{TANGGAL_SURAT}</span> : Untuk Tempat & Tanggal Surat
+                <br><span class="badge bg-dark mt-1">{QR_TTE}</span> : Untuk letak posisi QR Code
+                <br><span class="badge bg-dark mt-1">{TTD_NAMA}</span> : Untuk Nama Kepala Sekolah
+                <br><span class="badge bg-dark mt-1">{TTD_PANGKAT}</span> : Untuk Pangkat/Golongan
+                <br><span class="badge bg-dark mt-1">{TTD_NIP}</span> : Untuk NIP
+            </li>
         </ul>
         <hr>
-        <label class="fw-bold mb-1">Upload File Anda:</label>
+        <label class="fw-bold mb-1">Upload File Anda (.docx):</label>
         <input type="file" id="fileUploadDocx" accept=".docx" class="form-control form-control-lg border-warning">
-        <div class="form-text mt-2"><i class="fas fa-info-circle"></i> Pastikan di dalam dokumen Anda sudah diketik teks <b>{NOMOR_SURAT}</b> dan <b>{QR_TTE}</b>.</div>
     </div>
     <input type="hidden" name="isUploadMode" id="isUploadMode" value="false">
 </div>
@@ -858,20 +864,17 @@ input, button, select, textarea {
         $('#wrap-mode-upload').removeClass('hide');
         $('#isUploadMode').val('true');
         
-        // Sembunyikan isian detail karena isi surat sudah ada di Word
+        // Sembunyikan SEMUA isian detail surat karena sudah ada di dalam Word
         $('.form-box').addClass('hide').find('input,textarea,select').prop('disabled', true);
-        // Kita hanya butuh nomor urut & perihal (Perihal wajib untuk nama file)
-        $('input[name="perihal"]').prop('disabled', false).val('').attr('placeholder', 'Masukkan Perihal Surat (Wajib)');
-        $('#box-umum').removeClass('hide').find('.col-md-2, .col-md-10, .col-md-6:not(:first), .mb-2').addClass('hide'); 
-        $('#box-umum .row:first .col-md-6').removeClass('hide'); // Hanya tampilkan perihal
-        $('#box-tembusan').addClass('hide').find('textarea').prop('disabled', true); // Sembunyikan tembusan (sudah ada di word)
+        
+        // Pastikan box tembusan juga sembunyi
+        $('#box-tembusan').addClass('hide').find('textarea').prop('disabled', true); 
     } else {
         $('#wrap-mode-sistem').removeClass('hide');
         $('#wrap-mode-upload').addClass('hide');
         $('#isUploadMode').val('false');
         
         // Kembalikan form seperti semula
-        $('#box-umum').find('.hide').removeClass('hide'); 
         gantiFormSurat();
     }
 }
@@ -901,7 +904,7 @@ input, button, select, textarea {
   function updateHariAcara() { const v=$('#inpTglAcara').val(); if(v){ const d=new Date(v); $('#valHariAcara').val(d.toLocaleDateString('id-ID',{weekday:'long'})); $('#valTglAcaraIndo').val(d.toLocaleDateString('id-ID',{year:'numeric',month:'long',day:'numeric'})); } }
   
   
-  function submitGenerate(e) { 
+ function submitGenerate(e) { 
     e.preventDefault(); 
     if(!$('#inpTglSurat').val()){Swal.fire('Info','Tgl Surat wajib diisi','warning');return;} 
     
@@ -921,19 +924,14 @@ input, button, select, textarea {
     dataObj.currentUser = localStorage.getItem('sidimas_user');
     dataObj.currentRole = localStorage.getItem('sidimas_role');
     
-    // --- JIKA MODE UPLOAD, UBAH FILE KE BASE64 DULU SEBELUM KIRIM ---
     if (mode === 'upload') {
-        if (!dataObj.perihal) {
-            setBtnLoading('#btnGen', false, 'GENERATE DOKUMEN'); 
-            Swal.fire('Info', 'Kolom Perihal wajib diisi untuk penamaan arsip!', 'warning');
-            return;
-        }
+        // Beri nama default secara otomatis karena form perihal sudah kita matikan
+        dataObj.perihal = "Dokumen_Upload_TTE"; 
         
         showLoadingTimer2('Mengonversi File Word...');
         const reader = new FileReader();
         reader.onload = function(ev) {
             dataObj.fileData = ev.target.result.split(',')[1];
-            // Lanjut panggil API setelah file siap
             panggilApiGenerate(dataObj);
         };
         reader.readAsDataURL(fileInput.files[0]);
@@ -943,7 +941,7 @@ input, button, select, textarea {
     }
 }
 
-// Fungsi pembantu agar kode rapi
+// Fungsi pembantu agar panggilan API tetap rapi
 function panggilApiGenerate(dataObj) {
     apiCall('generateDokumen', dataObj)
        .then(r=>{ 
