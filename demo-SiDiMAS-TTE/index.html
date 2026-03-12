@@ -1160,10 +1160,10 @@ function refreshDrafts() {
             {title:"Pembuat", data: "pembuat", render: d => `<span class="badge bg-secondary">${d}</span>`},
             {title:"Nomor & Perihal", render: (d,t,r) => `<b>${r.no}</b><br>${r.perihal}`},
             {title:"Jenis usulan", data: "jenisTtd"},
-            // PERHATIKAN: Kita mem-passing id, pembuat, dan catatan ke fungsi render
             {title:"Aksi", render: (d,t,r) => renderAksiDraft(r.id, r.pembuat, r.catatan)}
         ];
         $('#tDraft').DataTable({ data: data, columns: cols, scrollX: true, destroy: true, language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json" }, order: [[1,'desc']] });
+    }); // <-- INI YANG HILANG SEBELUMNYA
 }
 
 function renderAksiDraft(id, pembuat, catatan) {
@@ -1269,7 +1269,8 @@ function refreshKepsek() {
             `}
         ];
         
-       $('#tKepsek').DataTable({ data: data, columns: cols, scrollX: true, destroy: true, language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json" }, order: [[1,'desc']] });
+        $('#tKepsek').DataTable({ data: data, columns: cols, scrollX: true, destroy: true, language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json" }, order: [[1,'desc']] });
+    }); // <-- INI JUGA HILANG
 }
 
 function kembalikanKepsek(id) {
@@ -1360,6 +1361,7 @@ function refreshHasil() {
             }}
         ];
         $('#tHasil').DataTable({ data: data, columns: cols, scrollX: true, destroy: true, language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json" }, order: [[1,'desc']] });
+    }); // <-- DAN INI YANG HILANG
 }
 
 function unduhDokumenStaf(id) {
