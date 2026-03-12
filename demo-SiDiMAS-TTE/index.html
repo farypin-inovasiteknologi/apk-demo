@@ -522,7 +522,7 @@ input, button, select, textarea {
       </div>
   </div>
 
-  <div class="modal fade" id="modalUser" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">User</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form onsubmit="submitUser(event)"><input type="hidden" name="mode" id="uMode"><input type="hidden" name="oldUsername" id="uOld"><div class="mb-2"><label>Username</label><input name="username" id="uName" class="form-control" required></div><div class="mb-2"><label>Password</label><input name="password" id="uPass" class="form-control" required></div><div <div class="mb-2">
+  <div class="modal fade" id="modalUser" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">User</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form onsubmit="submitUser(event)"><input type="hidden" name="mode" id="uMode"><input type="hidden" name="oldUsername" id="uOld"><div class="mb-2"><label>Username</label><input name="username" id="uName" class="form-control" required></div><div class="mb-2"><label>Password</label><input name="password" id="uPass" class="form-control" required></div><div class="mb-2">
     <label>Role</label>
     <select name="role" id="uRole" class="form-select">
         <option value="Admin">Admin</option>
@@ -1163,8 +1163,7 @@ function refreshDrafts() {
             // PERHATIKAN: Kita mem-passing id, pembuat, dan catatan ke fungsi render
             {title:"Aksi", render: (d,t,r) => renderAksiDraft(r.id, r.pembuat, r.catatan)}
         ];
-        $('#tDraft').DataTable({ data: data, columns: cols, scrollX: true, destroy: true, language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json" }, order: [[1,'desc']]
-    });
+        $('#tDraft').DataTable({ data: data, columns: cols, scrollX: true, destroy: true, language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json" }, order: [[1,'desc']] });
 }
 
 function renderAksiDraft(id, pembuat, catatan) {
@@ -1270,8 +1269,7 @@ function refreshKepsek() {
             `}
         ];
         
-        $('#tKepsek').DataTable({ data: data, columns: cols, scrollX: true, destroy: true, language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json" }, order: [[1,'desc']]
-    });
+       $('#tKepsek').DataTable({ data: data, columns: cols, scrollX: true, destroy: true, language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json" }, order: [[1,'desc']] });
 }
 
 function kembalikanKepsek(id) {
@@ -1361,8 +1359,7 @@ function refreshHasil() {
                 }
             }}
         ];
-        $('#tHasil').DataTable({ data: data, columns: cols, scrollX: true, destroy: true, language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json" }, order: [[1,'desc']];
-    });
+        $('#tHasil').DataTable({ data: data, columns: cols, scrollX: true, destroy: true, language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json" }, order: [[1,'desc']] });
 }
 
 function unduhDokumenStaf(id) {
