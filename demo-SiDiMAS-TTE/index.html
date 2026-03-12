@@ -567,7 +567,7 @@ input, button, select, textarea {
   <script>
   /* --- KONFIGURASI API (URL DARI GOOGLE APPS SCRIPT) --- */
   // NANTI GANTI LINK DI BAWAH INI DENGAN LINK HASIL DEPLOY APPS SCRIPT KAMU
-  const API_URL = "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbyzA3WTfQ7aLRDK1YGGs8BmM_kDVCp_4Oq331mDSZiI4b-vW0dYaeKKByJisyVlkJEw/exec"; 
+  const API_URL = "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbzuzx7f57BcaNBoDueHzw0fZVlnJxVVFBk3qG2P7htHy7fvCSF6BPU9OecePsFx8mpp/exec"; 
   
 
   /* --- FUNGSI JEMBATAN PENGHUBUNG (FETCH API) --- */
@@ -1042,7 +1042,7 @@ function panggilApiGenerate(dataObj) {
       const cm=[ {title:"ID",visible:false}, {title:"Tgl Terima"},{title:"Pengirim"},{title:"Tgl Surat"},{title:"No Surat"}, {title:"Perihal"},{title:"Tujuan"},{title:"Uraian"},{title:"Ket"}, {title:"File",render:btnFile}, {title:"Aksi",render:(d,t,row,meta) => renderAksi(meta.row, 'masuk')} ]; 
       const ck=[ {title:"ID",visible:false}, {title:"Tgl Surat"},{title:"Klasifikasi"},{title:"No Surat"},{title:"Perihal"}, {title:"Tujuan"},{title:"Uraian"},{title:"Ket"}, {title:"File",render:btnFile}, {title:"Aksi",render:(d,t,row,meta) => renderAksi(meta.row, 'keluar')} ]; 
       
-      $(tid).DataTable({ data: r, columns: (j==='masuk')?cm:ck, scrollX: true, destroy: true, language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json" }, order: [[0,'desc']] }); 
+      $(tid).DataTable({ data: r, columns: (j==='masuk')?cm:ck, scrollX: true, destroy: true, language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json" }, order: [] });
     }); 
   }
   
@@ -1163,7 +1163,7 @@ function refreshDrafts() {
             // PERHATIKAN: Kita mem-passing id, pembuat, dan catatan ke fungsi render
             {title:"Aksi", render: (d,t,r) => renderAksiDraft(r.id, r.pembuat, r.catatan)}
         ];
-        $('#tDraft').DataTable({ data: data, columns: cols, scrollX: true, destroy: true, language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json" }, order: [[1,'asc']] });
+        $('#tDraft').DataTable({ data: data, columns: cols, scrollX: true, destroy: true, language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json" }, order: [[1,'desc']]
     });
 }
 
@@ -1270,7 +1270,7 @@ function refreshKepsek() {
             `}
         ];
         
-        $('#tKepsek').DataTable({ data: data, columns: cols, scrollX: true, destroy: true, language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json" }, order: [[1,'asc']] });
+        $('#tKepsek').DataTable({ data: data, columns: cols, scrollX: true, destroy: true, language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json" }, order: [[1,'desc']]
     });
 }
 
@@ -1361,7 +1361,7 @@ function refreshHasil() {
                 }
             }}
         ];
-        $('#tHasil').DataTable({ data: data, columns: cols, scrollX: true, destroy: true, language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json" }, order: [[1,'asc']] });
+        $('#tHasil').DataTable({ data: data, columns: cols, scrollX: true, destroy: true, language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json" }, order: [[1,'desc']];
     });
 }
 
