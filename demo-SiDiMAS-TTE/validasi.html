@@ -84,7 +84,30 @@
 
     <script>
         // MASUKKAN LINK APPS SCRIPT ANDA DI SINI
-        const API_URL = " https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbzuzx7f57BcaNBoDueHzw0fZVlnJxVVFBk3qG2P7htHy7fvCSF6BPU9OecePsFx8mpp/exec";
+       // const API_URL = " https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbzuzx7f57BcaNBoDueHzw0fZVlnJxVVFBk3qG2P7htHy7fvCSF6BPU9OecePsFx8mpp/exec"; //versi mandiri
+
+        const DATABASE_MAP = {
+      "sd1": "https://script.google.com/macros/s/LINK_GAS_SD1/exec",
+      "smp2": "https://script.google.com/macros/s/LINK_GAS_SMP2/exec",
+      "sma3": "https://script.google.com/macros/s/LINK_GAS_SMA3/exec",
+      "demo": "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbwovc94KGI3V7a_4Xa_FIBqOg-M7ul7CgNBn-vDsM4eMAmO3GQWdRr8gR1iJ6WdsVyw/exec"
+  };
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const appId = urlParams.get('app');
+  const idSurat = urlParams.get('id');
+
+  const API_URL = DATABASE_MAP[appId];
+
+  if (!API_URL || !idSurat) {
+      // Tampilkan pesan error jika link tidak sah
+      $('#container').html('<div class="alert alert-danger">Dokumen atau Instansi tidak valid!</div>');
+  } else {
+      // Lanjutkan proses ambil data (fetch) ke API_URL yang terpilih
+      prosesValidasi(API_URL, idSurat);
+  }
+
+//============batas multi url============================================
 
         document.addEventListener('DOMContentLoaded', () => {
             // Ambil Parameter ID dari URL (?id=...)
