@@ -828,18 +828,23 @@ input, button, select, textarea {
 
   function loadInitData() {
       apiCall('loadInitData').then(s => {
-          const currentUrlAppId = new URLSearchParams(window.location.search).get('app') || localStorage.getItem('sidimas_active_app');
+          // Ambil ID dari URL (?app=...)
+          const params = new URLSearchParams(window.location.search);
+          const urlAppId = params.get('app');
           
-          // VALIDASI TERAKHIR: Apakah ID di database sama dengan ID di URL?
-          if (s.app_identity !== currentUrlAppId) {
+          // VALIDASI: Jika ID dari Database (s.app_identity) tidak sama dengan ID di URL
+          if (urlAppId && s.app_identity !== urlAppId) {
+              console.error("Mismatch! DB:" + s.app_identity + " URL:" + urlAppId);
+              
               Swal.fire({
                   icon: 'error',
                   title: 'Konfigurasi Tidak Cocok!',
-                  text: 'Database yang merespon bukan milik instansi ini. Sesi dihentikan.',
-                  allowOutsideClick: false
+                  text: 'Database ini ('+ s.app_identity +') tidak sesuai dengan Link URL ('+ urlAppId +').',
+                  confirmButtonText: 'Perbaiki Otomatis'
               }).then(() => {
+                  // Hapus memori lama dan paksa pakai ID yang sesuai database
                   localStorage.clear();
-                  window.location.reload();
+                  window.location.href = window.location.origin + window.location.pathname + "?app=" + s.app_identity;
               });
               return;
           }
@@ -861,6 +866,11 @@ input, button, select, textarea {
         });
     }
     apiCall('getRefLembaga').then(l => { let opts = ''; l.forEach(x => opts += `<option value="${x.k}">${x.n}</option>`); $('#listLembaga').html(opts); });
+
+   catch(err => {
+      Swal.fire('Koneksi Gagal', 'Gagal terhubung ke Database. Pastikan Link API benar dan sudah di-Deploy.', 'error');
+  });
+
   }
 
   function setBtnLoading(btnId, isLoading, defaultText) {
