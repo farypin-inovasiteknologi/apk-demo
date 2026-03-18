@@ -82,89 +82,70 @@
         </div>
     </div>
 
-    <script>
-        // MASUKKAN LINK APPS SCRIPT ANDA DI SINI
-       // const API_URL = " https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbzuzx7f57BcaNBoDueHzw0fZVlnJxVVFBk3qG2P7htHy7fvCSF6BPU9OecePsFx8mpp/exec"; //versi mandiri
-
-        const DATABASE_MAP = {
+<script>
+  const DATABASE_MAP = {
       "sd1": "https://script.google.com/macros/s/LINK_GAS_SD1/exec",
       "smp2": "https://script.google.com/macros/s/LINK_GAS_SMP2/exec",
       "sma3": "https://script.google.com/macros/s/LINK_GAS_SMA3/exec",
-      "demo": "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbwovc94KGI3V7a_4Xa_FIBqOg-M7ul7CgNBn-vDsM4eMAmO3GQWdRr8gR1iJ6WdsVyw/exec"
+      "demo": "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbzXJE_iNm45vAhFgz9UoOGg-fNMBVCGX2Ay4B3Hb1ime0z340565OISXHK-q5_tn15w/exec"
   };
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const appId = urlParams.get('app');
-  const idSurat = urlParams.get('id');
+  document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const appId = urlParams.get('app');
+      const idSurat = urlParams.get('id');
+      const API_URL = DATABASE_MAP[appId];
 
-  const API_URL = DATABASE_MAP[appId];
+      // Pengecekan awal: Jika parameter tidak lengkap
+      if (!API_URL || !idSurat) {
+          tampilkanError("Dokumen atau Instansi tidak valid! Pastikan Anda memindai QR Code yang benar.");
+          return; // Hentikan proses
+      }
 
-  if (!API_URL || !idSurat) {
-      // Tampilkan pesan error jika link tidak sah
-      $('#container').html('<div class="alert alert-danger">Dokumen atau Instansi tidak valid!</div>');
-  } else {
-      // Lanjutkan proses ambil data (fetch) ke API_URL yang terpilih
-      prosesValidasi(API_URL, idSurat);
+      // Mulai Fetch Data ke Google Apps Script
+      fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: 'getValidasiData', payload: { id: idSurat } }),
+      })
+      .then(res => res.json())
+      .then(res => {
+          if (res.success) {
+              renderData(res.data);
+          } else {
+              tampilkanError(res.message);
+          }
+      })
+      .catch(err => {
+          tampilkanError("Gagal terhubung ke server verifikasi. Silakan coba lagi nanti.");
+      });
+  });
+
+  function renderData(data) {
+      document.getElementById('loading-screen').classList.add('hide');
+      document.getElementById('result-screen').classList.remove('hide');
+
+      if(data.logoInstansi) { document.getElementById('v-logo1').src = data.logoInstansi; document.getElementById('v-logo1').classList.remove('hide'); }
+      if(data.logoSekolah) { document.getElementById('v-logo2').src = data.logoSekolah; document.getElementById('v-logo2').classList.remove('hide'); }
+      
+      document.getElementById('v-instansi').innerText = data.namaInstansi;
+      document.getElementById('v-sekolah').innerText = data.namaSekolah;
+      document.getElementById('v-nama').innerText = data.namaKepsek;
+      document.getElementById('v-nip').innerText = data.nipKepsek;
+      document.getElementById('v-ins2').innerText = data.namaInstansi;
+      
+      // Format Nomor Surat (Tambahkan <wbr> untuk memotong baris)
+      document.getElementById('v-nomor').innerHTML = data.noSurat.split('/').join('/<wbr>');
+      document.getElementById('v-waktu').innerHTML = data.waktuTtd.replace(/&lt;br&gt;/g, "<br>");
+      
+      document.getElementById('btn-pdf').href = data.fileUrl;
   }
 
-//============batas multi url============================================
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // Ambil Parameter ID dari URL (?id=...)
-            const urlParams = new URLSearchParams(window.location.search);
-            const idSurat = urlParams.get('id');
-
-            if (!idSurat) {
-                tampilkanError("ID Surat tidak valid. Harap scan langsung dari QR Code aslinya.");
-                return;
-            }
-
-            // Panggil API Google Apps Script secara tersembunyi (Fetch)
-            fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain' },
-                body: JSON.stringify({ action: 'getValidasiData', payload: { id: idSurat } }),
-            })
-            .then(res => res.json())
-            .then(res => {
-                if (res.success) {
-                    renderData(res.data);
-                } else {
-                    tampilkanError(res.message);
-                }
-            })
-            .catch(err => {
-                tampilkanError("Gagal terhubung ke server verifikasi. Coba lagi.");
-            });
-        });
-
-        function renderData(data) {
-            document.getElementById('loading-screen').classList.add('hide');
-            document.getElementById('result-screen').classList.remove('hide');
-
-            if(data.logoInstansi) { document.getElementById('v-logo1').src = data.logoInstansi; document.getElementById('v-logo1').classList.remove('hide'); }
-            if(data.logoSekolah) { document.getElementById('v-logo2').src = data.logoSekolah; document.getElementById('v-logo2').classList.remove('hide'); }
-            
-            document.getElementById('v-instansi').innerText = data.namaInstansi;
-            document.getElementById('v-sekolah').innerText = data.namaSekolah;
-            
-            document.getElementById('v-nama').innerText = data.namaKepsek;
-            document.getElementById('v-nip').innerText = data.nipKepsek;
-            document.getElementById('v-ins2').innerText = data.namaInstansi;
-            
-            // Format Nomor Surat (Tambahkan <wbr> untuk memotong baris)
-            document.getElementById('v-nomor').innerHTML = data.noSurat.split('/').join('/<wbr>');
-            // Memaksa tulisan <br> (jika terbaca sebagai teks) agar diubah menjadi garis baru sungguhan
-            document.getElementById('v-waktu').innerHTML = data.waktuTtd.replace("&lt;br&gt;", "<br>");
-            
-            document.getElementById('btn-pdf').href = data.fileUrl;
-        }
-
-        function tampilkanError(pesan) {
-            document.getElementById('loading-screen').classList.add('hide');
-            document.getElementById('error-screen').classList.remove('hide');
-            document.getElementById('error-msg').innerText = pesan;
-        }
-    </script>
+  function tampilkanError(pesan) {
+      document.getElementById('loading-screen').classList.add('hide');
+      document.getElementById('error-screen').classList.remove('hide');
+      document.getElementById('error-msg').innerText = pesan;
+  }
+</script>
 </body>
 </html>
