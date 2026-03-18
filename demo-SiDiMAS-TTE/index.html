@@ -617,7 +617,8 @@ input, button, select, textarea {
   <script>
   /* --- KONFIGURASI API (URL DARI GOOGLE APPS SCRIPT) --- */
   // NANTI GANTI LINK DI BAWAH INI DENGAN LINK HASIL DEPLOY APPS SCRIPT KAMU
-  const API_URL = "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbxbqGLyJPav1E2NKWvk5CGS1mC5ghc7rUJH05B0j-WN77W4lueituerR98svVBJeQQ7/exec"; 
+  const API_URL = "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbwS27WbmuBTOtzNFvts_8rqgmHnR_z54P18_MUH1LoHFrPhH7yxfc15z4d0KUzzLAs/exec"; 
+
 
   /* --- FUNGSI JEMBATAN PENGHUBUNG (FETCH API) --- */
   async function apiCall(actionName, payloadData = {}) {
@@ -1597,13 +1598,17 @@ function scanDokumenAI() {
                     if(d.tglSurat) $('#inTglSuratM').val(d.tglSurat);
                     if(d.noSurat) $('#inNoSuratM').val(d.noSurat);
                     if(d.perihal) $('#inPerihalM').val(d.perihal);
-                    if(d.tujuan) $('#inPengirim').val(d.tujuan); 
+                    
+                    // SEKARANG SUDAH DIPISAH TEGAS OLEH AI
+                    if(d.pengirim) $('#inPengirim').val(d.pengirim); 
+                    if(d.tujuan) $('#inTujuanM').val(d.tujuan); 
+                    
                     if(d.uraian) $('#inUraianM').val(d.uraian);
                 } else {
                     if(d.tglSurat) $('#inTglSuratK').val(d.tglSurat);
                     if(d.noSurat) $('#inNoSuratK').val(d.noSurat);
                     if(d.perihal) $('#inPerihalK').val(d.perihal);
-                    if(d.tujuan) $('#inTujuanK').val(d.tujuan);
+                    if(d.tujuan) $('#inTujuanK').val(d.tujuan); // Tujuan surat keluar
                     if(d.uraian) $('#inUraianK').val(d.uraian);
                 }
             } else {
