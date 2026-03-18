@@ -445,9 +445,27 @@ input, button, select, textarea {
                   <div class="alert alert-warning border-warning shadow-sm mb-4"><div class="d-flex justify-content-between align-items-center"><div><i class="fas fa-database fa-lg me-2"></i><strong>Backup Database</strong><div class="small text-muted">Cadangkan data surat masuk, keluar, dan user ke Spreadsheet baru.</div></div><button id="btnBackup" class="btn btn-warning fw-bold" onclick="doBackup()"><span>Backup Sekarang</span><span class="spinner-border spinner-border-sm hide" role="status"></span></button></div></div>
                   <form onsubmit="simpanSetting(event)" autocomplete="off">
                       <h6 class="text-primary border-bottom pb-2">Identitas Sekolah</h6>
-                      <div class="row mb-2">
-                      <div class="col-md-6"><label class="text-success">Logo Instansi</label><input type="file" id="fLogo1" class="form-control" accept="image/*"></div>
-                      <div class="col-md-6"><label class="text-success">Logo Sekolah</label><input type="file" id="fLogo2" class="form-control" accept="image/*"></div></div>
+                      <div class="row mb-3">
+                 <div class="col-md-6">
+          <label class="text-success fw-bold">Logo Instansi</label>
+          <input type="file" id="fLogo1" class="form-control" accept="image/*">
+          <div id="wrapPreview1" class="mt-2 hide align-items-center">
+              <img id="imgPreview1" src="" class="rounded border shadow-sm" style="width:70px; height:70px; object-fit:contain; background:#fff;">
+              <button type="button" class="btn btn-sm btn-outline-danger ms-3" onclick="hapusLogo('instansi')"><i class="fas fa-trash"></i> Hapus Logo</button>
+          </div>
+          <input type="hidden" name="delete_instansi" id="delInstansi" value="false">
+      </div>
+      
+      <div class="col-md-6">
+          <label class="text-success fw-bold">Logo Sekolah</label>
+          <input type="file" id="fLogo2" class="form-control" accept="image/*">
+          <div id="wrapPreview2" class="mt-2 hide align-items-center">
+              <img id="imgPreview2" src="" class="rounded border shadow-sm" style="width:70px; height:70px; object-fit:contain; background:#fff;">
+              <button type="button" class="btn btn-sm btn-outline-danger ms-3" onclick="hapusLogo('sekolah')"><i class="fas fa-trash"></i> Hapus Logo</button>
+          </div>
+          <input type="hidden" name="delete_sekolah" id="delSekolah" value="false">
+      </div>
+  </div>
                       <div class="row mb-2">
                       <div class="col-md-6"><label class="text-success">Nama Instansi</label><input name="namaInstansi" id="inInstansi" class="form-control" placeholder="PEMERINTAH PROVINSI..."></div>
                       <div class="col-md-6"><label class="text-success">Nama Dinas/OPD (boleh dikosongkan)</label><input name="namaOpd" id="inOpd" class="form-control" placeholder="ex. DINAS PENDIDIKAN......"></div></div>
@@ -698,8 +716,25 @@ input, button, select, textarea {
       localStorage.setItem('sidimas_settings', JSON.stringify(s));
       if(s.app_color) document.documentElement.style.setProperty('--main-color', s.app_color);
       
-      if(s.logo_instansi && s.logo_instansi.length>50) { $('#logLogo1, #logoKiri').attr('src', s.logo_instansi).show(); } else { $('#logLogo1, #logoKiri').hide(); }
-      if(s.logo_sekolah && s.logo_sekolah.length>50) { $('#logLogo2, #logoKanan').attr('src', s.logo_sekolah).show(); } else { $('#logLogo2, #logoKanan').hide(); }
+      if(s.logo_instansi && s.logo_instansi.length>50) { 
+          $('#logLogo1, #logoKiri').attr('src', s.logo_instansi).show(); 
+          $('#imgPreview1').attr('src', s.logo_instansi); 
+          $('#wrapPreview1').removeClass('hide').addClass('d-flex'); 
+          $('#delInstansi').val('false');
+      } else { 
+          $('#logLogo1, #logoKiri').hide(); 
+          $('#wrapPreview1').addClass('hide').removeClass('d-flex'); 
+      }
+      
+      if(s.logo_sekolah && s.logo_sekolah.length>50) { 
+          $('#logLogo2, #logoKanan').attr('src', s.logo_sekolah).show(); 
+          $('#imgPreview2').attr('src', s.logo_sekolah); 
+          $('#wrapPreview2').removeClass('hide').addClass('d-flex'); 
+          $('#delSekolah').val('false');
+      } else { 
+          $('#logLogo2, #logoKanan').hide(); 
+          $('#wrapPreview2').addClass('hide').removeClass('d-flex'); 
+      }
       
       $('#logInstansi').text((s.nama_instansi||'')+' '+(s.nama_opd||'')); 
       $('#logSekolah').text(s.nama_sekolah||'LOADING...');
@@ -719,6 +754,20 @@ input, button, select, textarea {
       $('#inKepsekNip2').val(s.kepsek_nip);
       $('#inKepsekPangkat2').val(s.kepsek_pangkat);
       $('#inpKodeSekolah').val(s.kode_lembaga);
+  }
+
+  function hapusLogo(jenis) {
+      if (jenis === 'instansi') {
+          $('#wrapPreview1').addClass('hide').removeClass('d-flex');
+          $('#fLogo1').val('');
+          $('#delInstansi').val('true');
+          croppedBase64_1 = null;
+      } else {
+          $('#wrapPreview2').addClass('hide').removeClass('d-flex');
+          $('#fLogo2').val('');
+          $('#delSekolah').val('true');
+          croppedBase64_2 = null;
+      }
   }
 
   function renderSettingsFromCache() {
@@ -943,9 +992,15 @@ input, button, select, textarea {
       const fd = new FormData(e.target); 
       const d = Object.fromEntries(fd); 
       
-      // Masukkan hasil potongan Cropper.js (jika ada yang dipotong)
-      if(croppedBase64_1) d.b64_instansi = croppedBase64_1; 
-      if(croppedBase64_2) d.b64_sekolah = croppedBase64_2; 
+      // Kirim kedua versi gambar ke Backend Google Apps Script
+      if (croppedBase64_1) {
+          d.b64_instansi = croppedBase64_1.png;
+          d.b64_instansi_qr = croppedBase64_1.qr; // Khusus QR
+      }
+      if (croppedBase64_2) {
+          d.b64_sekolah = croppedBase64_2.png;
+          d.b64_sekolah_qr = croppedBase64_2.qr; // Khusus QR
+      }
       
       apiCall('saveSettings', d).then(r => {
           Swal.close(); 
@@ -954,11 +1009,8 @@ input, button, select, textarea {
           } else { 
               Swal.fire('Sukses', 'Pengaturan diterapkan', 'success'); 
               loadInitData(); 
-              
-              // Bersihkan variabel setelah sukses simpan
               croppedBase64_1 = null; 
               croppedBase64_2 = null;
-              $('#previewLogo1, #previewLogo2').remove();
           } 
       }).catch(err => {
           Swal.close();
@@ -1747,18 +1799,31 @@ function simpanSettingKepsek(e) {
   $('#btnSaveCrop').click(function() {
       if (!cropper) return;
       
-      // Ambil hasil crop, dan paksa kompresi ke ukuran 150x150 pixel saja (Sangat Ringan!)
-      const canvas = cropper.getCroppedCanvas({ width: 150, height: 150 });
-      const base64 = canvas.toDataURL('image/png', 0.8);
+      // 1. Ambil kanvas Asli (PNG Transparan) untuk Aplikasi & Kop Surat
+      const croppedCanvas = cropper.getCroppedCanvas({ width: 150, height: 150 });
+      const base64_png = croppedCanvas.toDataURL('image/png', 0.8);
       
+      // 2. Buat Kanvas Baru Background Putih (JPEG) KHUSUS untuk QR Code
+      const whiteCanvas = document.createElement('canvas');
+      whiteCanvas.width = 150;
+      whiteCanvas.height = 150;
+      const ctx = whiteCanvas.getContext('2d');
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, 150, 150);
+      ctx.drawImage(croppedCanvas, 0, 0);
+      const base64_jpeg = whiteCanvas.toDataURL('image/jpeg', 0.9);
+      
+      // 3. Simpan KEDUANYA ke dalam variabel
       if (currentCropTarget === 'logo1') {
-          croppedBase64_1 = base64;
-          $('#previewLogo1').remove();
-          $('#fLogo1').after(`<img id="previewLogo1" src="${base64}" class="mt-2 rounded border shadow-sm" style="width:70px; height:70px; object-fit:cover;">`);
+          croppedBase64_1 = { png: base64_png, qr: base64_jpeg }; // Simpan 2 versi
+          $('#imgPreview1').attr('src', base64_png); // Preview tetap pakai yg transparan
+          $('#wrapPreview1').removeClass('hide').addClass('d-flex');
+          $('#delInstansi').val('false');
       } else {
-          croppedBase64_2 = base64;
-          $('#previewLogo2').remove();
-          $('#fLogo2').after(`<img id="previewLogo2" src="${base64}" class="mt-2 rounded border shadow-sm" style="width:70px; height:70px; object-fit:cover;">`);
+          croppedBase64_2 = { png: base64_png, qr: base64_jpeg }; // Simpan 2 versi
+          $('#imgPreview2').attr('src', base64_png); // Preview tetap pakai yg transparan
+          $('#wrapPreview2').removeClass('hide').addClass('d-flex');
+          $('#delSekolah').val('false');
       }
       
       bootstrap.Modal.getInstance(document.getElementById('modalCrop')).hide();
