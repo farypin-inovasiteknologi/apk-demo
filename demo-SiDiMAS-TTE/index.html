@@ -827,50 +827,33 @@ input, button, select, textarea {
   }
 
   function loadInitData() {
-      apiCall('loadInitData').then(s => {
-          // Ambil ID dari URL (?app=...)
-          const params = new URLSearchParams(window.location.search);
-          const urlAppId = params.get('app');
-          
-          // VALIDASI: Jika ID dari Database (s.app_identity) tidak sama dengan ID di URL
-          if (urlAppId && s.app_identity !== urlAppId) {
-              console.error("Mismatch! DB:" + s.app_identity + " URL:" + urlAppId);
-              
-              Swal.fire({
-                  icon: 'error',
-                  title: 'Konfigurasi Tidak Cocok!',
-                  text: 'Database ini ('+ s.app_identity +') tidak sesuai dengan Link URL ('+ urlAppId +').',
-                  confirmButtonText: 'Perbaiki Otomatis'
-              }).then(() => {
-                  // Hapus memori lama dan paksa pakai ID yang sesuai database
-                  localStorage.clear();
-                  window.location.href = window.location.origin + window.location.pathname + "?app=" + s.app_identity;
-              });
-              return;
-          }
+      apiCall('loadInitData')
+        .then(s => {
+            // 1. Ambil ID dari URL
+            const params = new URLSearchParams(window.location.search);
+            const urlAppId = params.get('app') || localStorage.getItem('sidimas_active_app');
+            
+            // 2. Validasi kecocokan ID Database dengan ID URL
+            if (urlAppId && s.app_identity !== urlAppId) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Konfigurasi Tidak Cocok!',
+                    text: 'Database (' + s.app_identity + ') tidak sesuai dengan ID URL (' + urlAppId + ').',
+                    confirmButtonText: 'Perbaiki Otomatis'
+                }).then(() => {
+                    localStorage.clear();
+                    window.location.href = window.location.origin + window.location.pathname + "?app=" + s.app_identity;
+                });
+                return; // Berhenti jika tidak cocok
+            }
 
-          renderAppAttributes(s);
-      });
-    
-    if($('#selKodeArsip').children('option').length <= 1) {
-        const cacheKode = localStorage.getItem('sidimas_kode_arsip');
-        if(cacheKode) $('#selKodeArsip').html(cacheKode);
-        apiCall('getKodeArsip').then(l => { 
-            let o='<option value="">-- Pilih Kode (Ketik untuk mencari...) --</option>'; l.forEach(k=>o+=`<option value="${k.c}">${k.l}</option>`); 
-            $('#selKodeArsip').html(o); localStorage.setItem('sidimas_kode_arsip', o); 
-        });
-    }
-    if($('#pilihJenisSurat').children('option').length <= 1) {
-        apiCall('getTemplateList').then(l => { 
-            let o='<option value="">-- Pilih Template --</option>'; l.forEach(t=>o+=`<option value="${t.id}">${t.name}</option>`); $('#pilihJenisSurat').html(o); 
-        });
-    }
-    apiCall('getRefLembaga').then(l => { let opts = ''; l.forEach(x => opts += `<option value="${x.k}">${x.n}</option>`); $('#listLembaga').html(opts); });
-
-   catch(err => {
-      Swal.fire('Koneksi Gagal', 'Gagal terhubung ke Database. Pastikan Link API benar dan sudah di-Deploy.', 'error');
-  });
-
+            // 3. Jika cocok, tampilkan data
+            renderAppAttributes(s);
+        }) 
+        .catch(err => {
+            console.error("Gagal koneksi:", err);
+            Swal.fire('Koneksi Gagal', 'Tidak bisa terhubung ke Database. Cek Link API di DATABASE_MAP.', 'error');
+        }); // Tanda penutup ini yang sering hilang atau double
   }
 
   function setBtnLoading(btnId, isLoading, defaultText) {
