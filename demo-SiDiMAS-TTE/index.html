@@ -657,7 +657,47 @@ input, button, select, textarea {
   <script>
   /* --- KONFIGURASI API (URL DARI GOOGLE APPS SCRIPT) --- */
   // NANTI GANTI LINK DI BAWAH INI DENGAN LINK HASIL DEPLOY APPS SCRIPT KAMU
-  const API_URL = "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbwovc94KGI3V7a_4Xa_FIBqOg-M7ul7CgNBn-vDsM4eMAmO3GQWdRr8gR1iJ6WdsVyw/exec"; 
+ // const API_URL = "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbwovc94KGI3V7a_4Xa_FIBqOg-M7ul7CgNBn-vDsM4eMAmO3GQWdRr8gR1iJ6WdsVyw/exec"; versi ori
+
+/* --- KONFIGURASI MULTI-DATABASE VIA URL ID --- */
+  const DATABASE_MAP = {
+      "sd1": "https://script.google.com/macros/s/LINK_GAS_SD1/exec",
+      "smp2": "https://script.google.com/macros/s/LINK_GAS_SMP2/exec",
+      "sma3": "https://script.google.com/macros/s/LINK_GAS_SMA3/exec",
+      "demo": "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbwovc94KGI3V7a_4Xa_FIBqOg-M7ul7CgNBn-vDsM4eMAmO3GQWdRr8gR1iJ6WdsVyw/exec"
+  };
+  
+
+  // Fungsi Deteksi Otomatis
+  function getActiveConfig() {
+      const params = new URLSearchParams(window.location.search);
+      let appId = params.get('app'); // Ambil ?app=xxx dari URL
+      
+      // Jika di URL tidak ada ?app=, coba cek di memori (localStorage)
+      if (!appId) {
+          appId = localStorage.getItem('sidimas_active_app');
+      }
+
+      if (appId && DATABASE_MAP[appId]) {
+          localStorage.setItem('sidimas_active_app', appId); // Simpan agar tidak hilang saat refresh
+          return DATABASE_MAP[appId];
+      }
+      
+      return null; // Tidak ada database yang cocok
+  }
+
+  let API_URL = getActiveConfig();
+
+  // Proteksi: Jika URL salah atau app ID tidak ada
+  if (!API_URL) {
+      document.body.innerHTML = `
+        <div style="text-align:center; margin-top:100px; font-family:sans-serif;">
+          <h2 style="color:red;">Akses Ditolak</h2>
+          <p>ID Instansi tidak valid atau tidak ditemukan dalam sistem.</p>
+        </div>`;
+  }
+
+  //=========batas multi url================================================================
 
 
   /* --- FUNGSI JEMBATAN PENGHUBUNG (FETCH API) --- */
@@ -736,7 +776,13 @@ input, button, select, textarea {
           $('#wrapPreview2').addClass('hide').removeClass('d-flex'); 
       }
       
-      $('#logInstansi').text((s.nama_instansi||'')+' '+(s.nama_opd||'')); 
+      // Logika dinamis untuk Nama Instansi & OPD di halaman Login
+      let teksLoginInstansi = s.nama_instansi || '';
+      if (s.nama_opd && s.nama_opd.trim() !== '') {
+          teksLoginInstansi += '<br>' + s.nama_opd; // Tambahkan Enter (<br>) jika OPD ada isinya
+      }
+      $('#logInstansi').html(teksLoginInstansi); // Gunakan .html agar <br> terbaca sebagai Enter
+      
       $('#logSekolah').text(s.nama_sekolah||'LOADING...');
       $('#txtInstansi').text(s.nama_instansi); $('#txtOpd').text(s.nama_opd); $('#txtSekolah').text(s.nama_sekolah); 
       $('#txtAlamat').text(s.alamat_sekolah); $('#txtEmail').text(s.email_sekolah); $('#txtWeb').text(s.website_sekolah);
