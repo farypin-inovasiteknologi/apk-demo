@@ -1194,7 +1194,7 @@ function panggilApiGenerate(dataObj) {
                   bootstrap.Modal.getInstance('#modalSurat').hide(); 
                   refreshTable(j); refreshAllTables(); 
               } else { 
-                  Swal.fire('Akses Ditolak',r.message,'error'); 
+                  Swal.fire('Gagal Menyimpan',r.message,'error'); 
               } 
            })
            .catch(err => { 
