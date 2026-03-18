@@ -140,11 +140,14 @@ input, button, select, textarea {
   <div id="view-dashboard" class="hide">
   <div class="d-md-none bg-primary text-white p-3 d-flex align-items-center justify-content-between shadow-sm sticky-top" style="z-index: 1040;">
    <div class="fw-bold fs-5">SiDiMAS</div>
-   <div class="d-flex gap-3 align-items-center">
-       <a onclick="nav('users', this)" class="text-white admin-only hide" title="Manajemen User"><i class="fas fa-users-cog fa-lg"></i></a>
-       <a onclick="nav('setting', this)" class="text-white admin-only hide" title="Pengaturan"><i class="fas fa-tools fa-lg"></i></a>
-       <a onclick="doLogout()" class="text-danger bg-white rounded-circle p-1 shadow-sm" title="Logout" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-power-off"></i></a>
-   </div>
+<div class="d-flex gap-2 align-items-center">
+    <a onclick="nav('users', this)" class="text-white admin-only hide" title="Manajemen User"><i class="fas fa-users-cog fa-lg"></i></a>
+    <a onclick="nav('setting', this)" class="text-white admin-only hide" title="Pengaturan"><i class="fas fa-tools fa-lg"></i></a>
+    
+    <a onclick="modalUbahProfil()" class="text-primary bg-white rounded-circle p-1 shadow-sm" title="Ubah Password" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor:pointer;"><i class="fas fa-key"></i></a>
+    
+    <a onclick="doLogout()" class="text-danger bg-white rounded-circle p-1 shadow-sm" title="Logout" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor:pointer;"><i class="fas fa-power-off"></i></a>
+</div>
 </div>
 
     <nav class="sidebar">
@@ -157,9 +160,10 @@ input, button, select, textarea {
         <li class="nav-item admin-only"><a class="nav-link text-warning fw-bold" onclick="nav('verifikasi', this)"><i class="fas fa-clipboard-check"></i>Verifikasi Surat</a></li>
         <li class="nav-item user-only hide"><a class="nav-link text-info fw-bold" onclick="nav('hasil', this)"><i class="fas fa-file-export"></i>Hasil Surat</a></li>
         <li class="nav-item kepsek-only"><a class="nav-link text-success fw-bold" onclick="nav('ttd', this)"><i class="fas fa-qrcode"></i>TTE Surat</a></li>
+        <li class="nav-item kepsek-only"><a class="nav-link text-white bg-secondary bg-opacity-25" onclick="nav('profil-kepsek', this)"><i class="fas fa-user-tie"></i>Data Kepsek</a></li>
         <li class="nav-item admin-only"><a class="nav-link" onclick="nav('users', this)"><i class="fas fa-users"></i>Manajemen User</a></li>
         <li class="nav-item admin-only"><a class="nav-link" onclick="nav('setting', this)"><i class="fas fa-cogs"></i>Settings</a></li>
-        <li class="nav-item"><a class="nav-link text-info fw-bold" onclick="modalUbahProfil()"><i class="fas fa-user-edit"></i>Ubah Profil</a></li>
+        <li class="nav-item"><a class="nav-link" onclick="modalUbahProfil()"><i class="fas fa-user-edit"></i>Ubah Profil</a></li>
         <li class="nav-item mt-5"><a class="nav-link text-white" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
       </ul>
     </nav>
@@ -468,6 +472,41 @@ input, button, select, textarea {
               </div>
           </div>
       </div>
+
+      <div id="page-profil-kepsek" class="page-view hide">
+    <div class="card shadow-sm border-0 border-top border-secondary border-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-secondary"><i class="fas fa-user-tie me-2"></i>Data Penandatangan (Kepsek)</h5>
+            <button class="btn btn-light btn-sm btn-refresh text-secondary" onclick="loadInitData()" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info small py-2"><i class="fas fa-info-circle me-1"></i> Pastikan data di bawah ini benar, karena akan tercetak di setiap dokumen yang Anda TTE.</div>
+            <form onsubmit="simpanSettingKepsek(event)" autocomplete="off">
+                <div class="mb-3">
+                    <label class="fw-bold text-secondary">Nama Lengkap (Beserta Gelar)</label>
+                    <input name="kepsekNama" id="inKepsekNama2" class="form-control form-control-lg" required>
+                </div>
+                <div class="mb-3">
+                    <label class="fw-bold text-secondary">NIP</label>
+                    <input name="kepsekNip" id="inKepsekNip2" class="form-control form-control-lg" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+                </div>
+                <div class="mb-4">
+                    <label class="fw-bold text-secondary">Pangkat / Golongan</label>
+                    <select name="kepsekPangkat" id="inKepsekPangkat2" class="form-select form-select-lg">
+                        <option>Pengatur Muda (II/a)</option><option>Pengatur Muda Tingkat I (II/b)</option><option>Pengatur (II/c)</option><option>Pengatur Tingkat I (II/d)</option><option>Penata Muda (III/a)</option><option>Penata Muda Tingkat I (III/b)</option><option>Penata (III/c)</option><option>Penata Tingkat I (III/d)</option><option>Pembina (IV/a)</option><option>Pembina Tingkat I (IV/b)</option><option>Pembina Utama Muda (IV/c)</option><option>Pembina Utama Madya (IV/d)</option><option>Pembina Utama (IV/e)</option>
+                    </select>
+                </div>
+                <button type="submit" id="btnSimpanKepsek" class="btn btn-secondary w-100 fw-bold py-3 shadow-sm rounded-pill">
+                    <span><i class="fas fa-save me-1"></i> SIMPAN DATA KEPSEK</span>
+                    <span class="spinner-border spinner-border-sm hide" role="status"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
       <div class="footer">&copy; 2026 SiDiMAS | All Right Reserved. <br> <a href="javascript:void(0)" onclick="modalPrivasi()">Kebijakan Privasi</a> | Created by : <a href='https://www.farypin-inovasiteknologi.com' target="_blank" style="color:white">PT Farypin Inovasi Teknologi</a></div>
     </div>
 
@@ -476,17 +515,16 @@ input, button, select, textarea {
     <a class="nav-item-mobile" onclick="nav('masuk', this)"><i class="fas fa-inbox"></i><span>Srt Masuk</span></a>
     
     <a class="nav-item-mobile btn-buat-surat non-kepsek hide" onclick="nav('buat', this)">
-        <div class="icon-wrapper"><i class="fas fa-magic"></i></div><span>Buat Surat</span>
-    </a>
+        <div class="icon-wrapper"><i class="fas fa-magic"></i></div><span>Buat Surat</span></a>
     <a class="nav-item-mobile btn-buat-surat kepsek-only hide" onclick="nav('ttd', this)">
-        <div class="icon-wrapper" style="background: linear-gradient(135deg, #198754, #20c997);"><i class="fas fa-qrcode"></i></div><span>TTE Surat</span>
-    </a>
+        <div class="icon-wrapper" style="background: linear-gradient(135deg, #198754, #20c997);"><i class="fas fa-qrcode"></i></div><span>TTE Surat</span></a>
 
     <a class="nav-item-mobile" onclick="nav('keluar', this)"><i class="fas fa-paper-plane"></i><span>Srt Keluar</span></a>
     
     <a class="nav-item-mobile text-warning admin-only hide" onclick="nav('verifikasi', this)"><i class="fas fa-clipboard-check"></i><span>Verifikasi</span></a>
     <a class="nav-item-mobile text-info user-only hide" onclick="nav('hasil', this)"><i class="fas fa-file-export"></i><span>Hasil Surat</span></a>
-    <a class="nav-item-mobile text-primary" onclick="modalUbahProfil()"><i class="fas fa-user-cog"></i><span>Profil</span></a>
+    
+    <a class="nav-item-mobile text-secondary kepsek-only hide" onclick="nav('profil-kepsek', this)"><i class="fas fa-user-tie"></i><span>Data Kepsek</span></a>
 </div>
 </div>
 
@@ -654,6 +692,10 @@ input, button, select, textarea {
       if(!$('input[name="ttdNama"]').val()) $('input[name="ttdNama"]').val(s.kepsek_nama);
       if(!$('input[name="ttdNip"]').val()) $('input[name="ttdNip"]').val(s.kepsek_nip);
       if(!$('input[name="ttdPangkat"]').val()) $('input[name="ttdPangkat"]').val(s.kepsek_pangkat);
+
+      $('#inKepsekNama2').val(s.kepsek_nama);
+      $('#inKepsekNip2').val(s.kepsek_nip);
+      $('#inKepsekPangkat2').val(s.kepsek_pangkat);
       $('#inpKodeSekolah').val(s.kode_lembaga);
   }
 
@@ -1006,6 +1048,7 @@ function panggilApiGenerate(dataObj) {
     if(p==='ttd') refreshKepsek();
     if(p==='hasil') refreshHasil();
     if(p==='users') loadUsers(); 
+    if(p==='profil-kepsek') loadInitData();
     if(p==='buat') { loadAutoNumber(); }
   }
     
@@ -1547,6 +1590,29 @@ function scanDokumenAI() {
     };
     reader.readAsDataURL(file);
 }
+
+function simpanSettingKepsek(e) {
+    e.preventDefault();
+    setBtnLoading('#btnSimpanKepsek', true, 'MENYIMPAN...');
+    
+    // Kita panggil fungsi API saveSettings yang sama dengan Admin (sangat fleksibel)
+    const fd = new FormData(e.target);
+    const d = Object.fromEntries(fd);
+    
+    apiCall('saveSettings', d).then(r => {
+        setBtnLoading('#btnSimpanKepsek', false, '<i class="fas fa-save me-1"></i> SIMPAN DATA KEPSEK');
+        if(r && r.success === false) { 
+            Swal.fire('Error', r.message, 'error'); 
+        } else { 
+            Swal.fire('Sukses!', 'Data Kepsek Anda berhasil diperbarui.', 'success'); 
+            loadInitData(); // Refresh UI dan header atas
+        }
+    }).catch(err => {
+        setBtnLoading('#btnSimpanKepsek', false, '<i class="fas fa-save me-1"></i> SIMPAN DATA KEPSEK');
+        Swal.fire('Error Server', 'Gagal menyimpan.', 'error');
+    });
+}
+
 </script>
 
 
