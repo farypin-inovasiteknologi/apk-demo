@@ -664,7 +664,7 @@ input, button, select, textarea {
       "sd1": "https://script.google.com/macros/s/LINK_GAS_SD1/exec",
       "smp2": "https://script.google.com/macros/s/LINK_GAS_SMP2/exec",
       "sma3": "https://script.google.com/macros/s/LINK_GAS_SMA3/exec",
-      "demo": "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbzXJE_iNm45vAhFgz9UoOGg-fNMBVCGX2Ay4B3Hb1ime0z340565OISXHK-q5_tn15w/exec"
+      "demo": "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbxt2kizI6K41shygcXsuaGopXNd0-KkWV0IVTfKTyxMnZFLaNs-LXSESqmU642J5w/exec"
   };
 
   // Fungsi Deteksi Otomatis
@@ -1235,7 +1235,7 @@ function panggilApiGenerate(dataObj) {
     if(p==='hasil') refreshHasil();
     if(p==='users') loadUsers(); 
     if(p==='profil-kepsek') loadInitData();
-    if(p==='buat') { loadAutoNumber(); }
+    if(p==='buat') { loadDropdownSurat(); loadAutoNumber(); }
   }
     
   
@@ -1897,6 +1897,30 @@ function simpanSettingKepsek(e) {
       
       bootstrap.Modal.getInstance(document.getElementById('modalCrop')).hide();
   });
+
+
+  function loadDropdownSurat() {
+    // 1. Ambil Data Template Surat
+    apiCall('getTemplateList').then(r => {
+        let html = '';
+        if(r && r.length > 0) {
+            r.forEach(t => { html += `<option value="${t.id}">${t.name}</option>`; });
+        } else {
+            html = '<option value="">Template tidak ditemukan!</option>';
+        }
+        $('#pilihJenisSurat').html(html);
+        gantiFormSurat(); // Sesuaikan form otomatis
+    }).catch(e => console.log("Error Template:", e));
+
+    // 2. Ambil Data Kode Arsip / Klasifikasi
+    apiCall('getKodeArsip').then(r => {
+        let html = '';
+        if(r && r.length > 0) {
+            r.forEach(k => { html += `<option value="${k.c}">${k.l}</option>`; });
+        }
+        $('#selKodeArsip').html(html).trigger('change'); // Update UI Select2
+    }).catch(e => console.log("Error Kode Arsip:", e));
+}
 
 </script>
 
