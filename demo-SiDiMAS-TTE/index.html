@@ -664,7 +664,7 @@ input, button, select, textarea {
       "sd1": "https://script.google.com/macros/s/LINK_GAS_SD1/exec",
       "smp2": "https://script.google.com/macros/s/LINK_GAS_SMP2/exec",
       "sma3": "https://script.google.com/macros/s/LINK_GAS_SMA3/exec",
-      "demo": "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbxt2kizI6K41shygcXsuaGopXNd0-KkWV0IVTfKTyxMnZFLaNs-LXSESqmU642J5w/exec"
+      "demo": "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbwtbLYt74W8uz439NW-staNyZOiBt3AkWYPRrxUQCFIiifUkxEDTdVMf8YLBJuoPpaI/exec"
   };
 
   // Fungsi Deteksi Otomatis
@@ -1285,8 +1285,18 @@ function panggilApiGenerate(dataObj) {
       const potongTeks = (d) => d && d.length > 50 ? d.substring(0, 50) + '...' : d;
       
       const cm=[ {title:"ID",visible:false}, {title:"Tgl Terima"},{title:"Pengirim"},{title:"Tgl Surat"},{title:"No Surat"}, {title:"Perihal"},{title:"Tujuan"},{title:"Uraian", render: potongTeks},{title:"Ket"}, {title:"File",render:btnFile}, {title:"Aksi",render:(d,t,row,meta) => renderAksi(meta.row, 'masuk')} ]; 
-      const ck=[ {title:"ID",visible:false}, {title:"Tgl Surat"},{title:"Klasifikasi"},{title:"No Surat"},{title:"Perihal"}, {title:"Tujuan"},{title:"Uraian", render: potongTeks},{title:"Ket"}, {title:"File",render:btnFile}, {title:"Aksi",render:(d,t,row,meta) => renderAksi(meta.row, 'keluar')} ]; 
-      
+      const ck=[ 
+    {title:"ID", visible:false}, 
+    {title:"Tgl Surat"},
+    {title:"Klasifikasi", visible:false}, // Kolom disembunyikan
+    {title:"No Surat"},
+    {title:"Perihal"}, 
+    {title:"Tujuan"},
+    {title:"Uraian", render: potongTeks},
+    {title:"Ket", visible:false}, // Kolom disembunyikan
+    {title:"File", render:btnFile}, 
+    {title:"Aksi", render:(d,t,row,meta) => renderAksi(meta.row, 'keluar')} ];
+
       $(tid).DataTable({ data: r, columns: (j==='masuk')?cm:ck, scrollX: true, destroy: true, language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json" }, order: [] });
     }); 
   }
