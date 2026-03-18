@@ -666,35 +666,40 @@ input, button, select, textarea {
       "sma3": "https://script.google.com/macros/s/LINK_GAS_SMA3/exec",
       "demo": "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbwovc94KGI3V7a_4Xa_FIBqOg-M7ul7CgNBn-vDsM4eMAmO3GQWdRr8gR1iJ6WdsVyw/exec"
   };
-  
 
   // Fungsi Deteksi Otomatis
-  function getActiveConfig() {
+  function getStrictConfig() {
       const params = new URLSearchParams(window.location.search);
-      let appId = params.get('app'); // Ambil ?app=xxx dari URL
-      
-      // Jika di URL tidak ada ?app=, coba cek di memori (localStorage)
-      if (!appId) {
-          appId = localStorage.getItem('sidimas_active_app');
+      const urlAppId = params.get('app'); // Ambil ID dari URL (?app=...)
+      const savedAppId = localStorage.getItem('sidimas_active_app');
+
+      // JIKA URL BERBEDA DENGAN MEMORI, RESET SEMUA DATA!
+      if (urlAppId && urlAppId !== savedAppId) {
+          console.warn("Deteksi perpindahan instansi. Melakukan pembersihan data...");
+          localStorage.clear(); // Hapus login, logo, dan session sekolah sebelumnya
+          localStorage.setItem('sidimas_active_app', urlAppId);
       }
 
-      if (appId && DATABASE_MAP[appId]) {
-          localStorage.setItem('sidimas_active_app', appId); // Simpan agar tidak hilang saat refresh
-          return DATABASE_MAP[appId];
+      const activeId = urlAppId || savedAppId;
+
+      if (activeId && DATABASE_MAP[activeId]) {
+          return DATABASE_MAP[activeId];
       }
-      
-      return null; // Tidak ada database yang cocok
+      return null;
   }
 
-  let API_URL = getActiveConfig();
+  let API_URL = getStrictConfig();
 
-  // Proteksi: Jika URL salah atau app ID tidak ada
+  // Jika ID tidak ada di daftar, STOP aplikasi (Blokir total)
   if (!API_URL) {
       document.body.innerHTML = `
-        <div style="text-align:center; margin-top:100px; font-family:sans-serif;">
-          <h2 style="color:red;">Akses Ditolak</h2>
-          <p>ID Instansi tidak valid atau tidak ditemukan dalam sistem.</p>
+        <div style="text-align:center; padding:50px; font-family:sans-serif;">
+          <h1 style="color:#dc3545;">⚠️ Akses Ilegal</h1>
+          <p>ID Instansi tidak terdaftar dalam sistem pusat kami.</p>
+          <hr style="width:50%; margin:20px auto;">
+          <small>Silakan hubungi Administrator untuk mendapatkan link yang valid.</small>
         </div>`;
+      throw new Error("Aplikasi dihentikan: ID Instansi tidak valid.");
   }
 
   //=========batas multi url================================================================
@@ -822,7 +827,25 @@ input, button, select, textarea {
   }
 
   function loadInitData() {
-    apiCall('getSettings').then(s => renderAppAttributes(s));
+      apiCall('loadInitData').then(s => {
+          const currentUrlAppId = new URLSearchParams(window.location.search).get('app') || localStorage.getItem('sidimas_active_app');
+          
+          // VALIDASI TERAKHIR: Apakah ID di database sama dengan ID di URL?
+          if (s.app_identity !== currentUrlAppId) {
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Konfigurasi Tidak Cocok!',
+                  text: 'Database yang merespon bukan milik instansi ini. Sesi dihentikan.',
+                  allowOutsideClick: false
+              }).then(() => {
+                  localStorage.clear();
+                  window.location.reload();
+              });
+              return;
+          }
+
+          renderAppAttributes(s);
+      });
     
     if($('#selKodeArsip').children('option').length <= 1) {
         const cacheKode = localStorage.getItem('sidimas_kode_arsip');
