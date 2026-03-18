@@ -115,7 +115,7 @@ input, button, select, textarea {
       <hr>
       <center><div>
         <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh5Iq0PC0J4qpH7z_GuIE9Cepwz0Rh89qLzw1DyombTi2PXzs1Nzre0ss1humGnCTbWM9fiTX6XrKp3KfXIo7SloNecnhDfB72l-Pc9s67S8y2oubyWbmxAVwGPlUusHFzJvXUNykBBcogD9yipbtV_n_f-VdjRmAzzyOawxdfjLH-T2BXtRGGZeX85a6k-/s709/logo%20sidimas%20TTE.png" alt="Logo" class="login-logo2">
-        <p class="text-muted small mb-4" style="font-weight: 600">Sistem Digital Manajemen Arsip Surat<br>TTE Terintegrasi & AI</p> 
+        <p class="text-muted small mb-4" style="font-weight: 600">Sistem Digital Manajemen Arsip Surat<br>TTE Terintegrasi + AI</p> 
       </div></center>
       <form onsubmit="prosesLogin(event)" autocomplete="off">
         <div class="form-floating mb-3 text-start"><input id="u" class="form-control" placeholder="U" required><label>Username</label></div>
@@ -617,7 +617,7 @@ input, button, select, textarea {
   <script>
   /* --- KONFIGURASI API (URL DARI GOOGLE APPS SCRIPT) --- */
   // NANTI GANTI LINK DI BAWAH INI DENGAN LINK HASIL DEPLOY APPS SCRIPT KAMU
-  const API_URL = "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbzfbqVtNJYbxIhTf4Yl3WSu8gx6nUI7dNJjXEW_6bg5MOjH3ajMIKUkm0eQTrpwD0Oi/exec"; 
+  const API_URL = "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbyFtlgMlv-Hmqv22YgvIF7m1jBZYUFG1OAFNGGn_PUequKGiwlbnbiy3bDSU-SGAZyC/exec"; 
 
   /* --- FUNGSI JEMBATAN PENGHUBUNG (FETCH API) --- */
   async function apiCall(actionName, payloadData = {}) {
@@ -1094,8 +1094,12 @@ function panggilApiGenerate(dataObj) {
     apiCall('ambilData', { jenis: j }).then(d => { 
       if(j === 'masuk') { dbMasuk = d || []; } else { dbKeluar = d || []; } 
       const r = (j==='masuk') ? dbMasuk : dbKeluar;
-      const cm=[ {title:"ID",visible:false}, {title:"Tgl Terima"},{title:"Pengirim"},{title:"Tgl Surat"},{title:"No Surat"}, {title:"Perihal"},{title:"Tujuan"},{title:"Uraian"},{title:"Ket"}, {title:"File",render:btnFile}, {title:"Aksi",render:(d,t,row,meta) => renderAksi(meta.row, 'masuk')} ]; 
-      const ck=[ {title:"ID",visible:false}, {title:"Tgl Surat"},{title:"Klasifikasi"},{title:"No Surat"},{title:"Perihal"}, {title:"Tujuan"},{title:"Uraian"},{title:"Ket"}, {title:"File",render:btnFile}, {title:"Aksi",render:(d,t,row,meta) => renderAksi(meta.row, 'keluar')} ]; 
+
+      // Fungsi untuk memotong teks panjang menjadi maksimal 50 karakter
+      const potongTeks = (d) => d && d.length > 50 ? d.substring(0, 50) + '...' : d;
+      
+      const cm=[ {title:"ID",visible:false}, {title:"Tgl Terima"},{title:"Pengirim"},{title:"Tgl Surat"},{title:"No Surat"}, {title:"Perihal"},{title:"Tujuan"},{title:"Uraian", render: potongTeks},{title:"Ket"}, {title:"File",render:btnFile}, {title:"Aksi",render:(d,t,row,meta) => renderAksi(meta.row, 'masuk')} ]; 
+      const ck=[ {title:"ID",visible:false}, {title:"Tgl Surat"},{title:"Klasifikasi"},{title:"No Surat"},{title:"Perihal"}, {title:"Tujuan"},{title:"Uraian", render: potongTeks},{title:"Ket"}, {title:"File",render:btnFile}, {title:"Aksi",render:(d,t,row,meta) => renderAksi(meta.row, 'keluar')} ]; 
       
       $(tid).DataTable({ data: r, columns: (j==='masuk')?cm:ck, scrollX: true, destroy: true, language: { url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json" }, order: [] });
     }); 
