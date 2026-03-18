@@ -617,7 +617,8 @@ input, button, select, textarea {
   <script>
   /* --- KONFIGURASI API (URL DARI GOOGLE APPS SCRIPT) --- */
   // NANTI GANTI LINK DI BAWAH INI DENGAN LINK HASIL DEPLOY APPS SCRIPT KAMU
-  const API_URL = "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbyFtlgMlv-Hmqv22YgvIF7m1jBZYUFG1OAFNGGn_PUequKGiwlbnbiy3bDSU-SGAZyC/exec"; 
+  const API_URL = "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbwovc94KGI3V7a_4Xa_FIBqOg-M7ul7CgNBn-vDsM4eMAmO3GQWdRr8gR1iJ6WdsVyw/exec"; 
+
 
   /* --- FUNGSI JEMBATAN PENGHUBUNG (FETCH API) --- */
   async function apiCall(actionName, payloadData = {}) {
@@ -852,7 +853,33 @@ input, button, select, textarea {
 
   /* --- FILE HANDLING --- */
   function resizeImage(file) { 
-      return new Promise(res => { if(!file) res(null); const r=new FileReader(); r.onload=e=>{ const i=new Image(); i.onload=()=>{ const c=document.createElement('canvas'); const s=100/i.height; c.height=100; c.width=i.width*s; c.getContext('2d').drawImage(i,0,0,c.width,c.height); res(c.toDataURL('image/png',0.8)); }; i.src=e.target.result; }; r.readAsDataURL(file); }); 
+      return new Promise(res => { 
+          if(!file) { res(null); return; }
+          const r = new FileReader(); 
+          r.onload = e => { 
+              const i = new Image(); 
+              i.onload = () => { 
+                  const c = document.createElement('canvas'); 
+                  // Cari sisi terkecil untuk membuat kotak sempurna 1:1
+                  const size = Math.min(i.width, i.height); 
+                  
+                  // Resolusi diturunkan jadi 150x150 pixels (Sangat kecil dan ringan!)
+                  c.width = 150; 
+                  c.height = 150; 
+                  const ctx = c.getContext('2d');
+                  
+                  // Logika Crop tepat di tengah gambar asli
+                  const startX = (i.width - size) / 2;
+                  const startY = (i.height - size) / 2;
+                  
+                  // Gambar ke kanvas baru dengan crop 1:1
+                  ctx.drawImage(i, startX, startY, size, size, 0, 0, c.width, c.height); 
+                  res(c.toDataURL('image/png', 0.8)); 
+              }; 
+              i.src = e.target.result; 
+          }; 
+          r.readAsDataURL(file); 
+      }); 
   }
   
   function compressImageForUpload(file) {
