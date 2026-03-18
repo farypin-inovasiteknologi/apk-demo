@@ -617,7 +617,7 @@ input, button, select, textarea {
   <script>
   /* --- KONFIGURASI API (URL DARI GOOGLE APPS SCRIPT) --- */
   // NANTI GANTI LINK DI BAWAH INI DENGAN LINK HASIL DEPLOY APPS SCRIPT KAMU
-  const API_URL = "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbz_p6lvg_0LzGwAeze1pjKTBsRDBVm9s3CB_3Jcygyj1sBe0jz_3bTfxsKeWMRP2hLg/exec"; 
+  const API_URL = "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbyXziWp_jAeqoiWfaNs8vRXEr_Q-yLJslWE0_x_yeW2of3p2zD77vBJKCKVxC1Si4yL/exec"; 
 
   /* --- FUNGSI JEMBATAN PENGHUBUNG (FETCH API) --- */
   async function apiCall(actionName, payloadData = {}) {
@@ -1514,7 +1514,19 @@ function modalUbahProfil() {
         }
     }).then((result) => {
         if (result.isConfirmed) {
-            Swal.showLoading();
+            
+            // --- KODE LOADING YANG BARU ---
+            Swal.fire({
+                title: 'Menyimpan Profil...',
+                text: 'Mohon tunggu sebentar',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            // ------------------------------
+
             // Memanggil fungsi updateProfile yang sudah Anda pasang di backend GAS
             apiCall('updateProfile', {
                 oldUsername: localStorage.getItem('sidimas_user'),
@@ -1564,7 +1576,18 @@ function scanDokumenAI() {
     reader.onload = function(e) {
         const base64String = e.target.result.split(',')[1];
         
-        apiCall('extractSuratAI', { b64: base64String, mimeType: file.type }).then(r => {
+        // --- TAMBAHAN BARU: Memaksa deteksi MIME Type secara manual ---
+        let tipeMime = file.type;
+        if (file.name.toLowerCase().endsWith('.pdf')) {
+            tipeMime = 'application/pdf'; // Paksa jadi PDF jika ekstensinya .pdf
+        } else if (file.name.toLowerCase().endsWith('.jpg') || file.name.toLowerCase().endsWith('.jpeg')) {
+            tipeMime = 'image/jpeg';
+        } else if (file.name.toLowerCase().endsWith('.png')) {
+            tipeMime = 'image/png';
+        }
+        
+        // Panggil API dengan tipeMime yang sudah pasti valid
+        apiCall('extractSuratAI', { b64: base64String, mimeType: tipeMime }).then(r => {
             if(r.success) {
                 Swal.fire('Berhasil!', 'Data otomatis terisi dari dokumen.', 'success');
                 const d = r.data;
@@ -1574,7 +1597,7 @@ function scanDokumenAI() {
                     if(d.tglSurat) $('#inTglSuratM').val(d.tglSurat);
                     if(d.noSurat) $('#inNoSuratM').val(d.noSurat);
                     if(d.perihal) $('#inPerihalM').val(d.perihal);
-                    if(d.tujuan) $('#inPengirim').val(d.tujuan); // Asumsi pengirim jika surat masuk
+                    if(d.tujuan) $('#inPengirim').val(d.tujuan); 
                     if(d.uraian) $('#inUraianM').val(d.uraian);
                 } else {
                     if(d.tglSurat) $('#inTglSuratK').val(d.tglSurat);
@@ -1601,7 +1624,7 @@ function simpanSettingKepsek(e) {
     
     // GANTI saveSettings MENJADI saveSettingKepsek
         apiCall('saveSettingKepsek', d).then(r => {
-        setBtnLoading('#btnSimpanKepsek', false, '<i class="fas fa-save me-1"></i> SIMPAN DATA KEPSEK');
+        setBtnLoading('#btnSimpanKepsek', false, 'SIMPAN DATA KEPSEK');
         if(r && r.success === false) { 
             Swal.fire('Error', r.message, 'error'); 
         } else { 
@@ -1609,7 +1632,7 @@ function simpanSettingKepsek(e) {
             loadInitData(); // Refresh UI dan header atas
         }
     }).catch(err => {
-        setBtnLoading('#btnSimpanKepsek', false, '<i class="fas fa-save me-1"></i> SIMPAN DATA KEPSEK');
+        setBtnLoading('#btnSimpanKepsek', false, 'SIMPAN DATA KEPSEK');
         Swal.fire('Error Server', 'Gagal menyimpan.', 'error');
     });
 }
