@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-    <title>Demo SiDiMAS TTE v2</title>
+    <title>Demo SiDiMAS TTE AI</title>
     <link rel="icon" type="image/png" href="./imgsidimas.png">
 
 
@@ -115,7 +115,7 @@ input, button, select, textarea {
       <hr>
       <center><div>
         <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh5Iq0PC0J4qpH7z_GuIE9Cepwz0Rh89qLzw1DyombTi2PXzs1Nzre0ss1humGnCTbWM9fiTX6XrKp3KfXIo7SloNecnhDfB72l-Pc9s67S8y2oubyWbmxAVwGPlUusHFzJvXUNykBBcogD9yipbtV_n_f-VdjRmAzzyOawxdfjLH-T2BXtRGGZeX85a6k-/s709/logo%20sidimas%20TTE.png" alt="Logo" class="login-logo2">
-        <p class="text-muted small mb-4" style="font-weight: 600">Sistem Digital Manajemen Arsip Surat<br>TTE Terintegrasi</p> 
+        <p class="text-muted small mb-4" style="font-weight: 600">Sistem Digital Manajemen Arsip Surat<br>TTE Terintegrasi + AI</p> 
       </div></center>
       <form onsubmit="prosesLogin(event)" autocomplete="off">
         <div class="form-floating mb-3 text-start"><input id="u" class="form-control" placeholder="U" required><label>Username</label></div>
@@ -143,7 +143,7 @@ input, button, select, textarea {
    <div class="d-flex gap-3 align-items-center">
        <a onclick="nav('users', this)" class="text-white admin-only hide" title="Manajemen User"><i class="fas fa-users-cog fa-lg"></i></a>
        <a onclick="nav('setting', this)" class="text-white admin-only hide" title="Pengaturan"><i class="fas fa-tools fa-lg"></i></a>
-       <a onclick="doLogout()" class="text-danger bg-white rounded-circle p-1 shadow-sm non-kepsek hide" title="Logout" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-power-off"></i></a>
+       <a onclick="doLogout()" class="text-danger bg-white rounded-circle p-1 shadow-sm" title="Logout" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-power-off"></i></a>
    </div>
 </div>
 
@@ -159,6 +159,7 @@ input, button, select, textarea {
         <li class="nav-item kepsek-only"><a class="nav-link text-success fw-bold" onclick="nav('ttd', this)"><i class="fas fa-qrcode"></i>TTE Surat</a></li>
         <li class="nav-item admin-only"><a class="nav-link" onclick="nav('users', this)"><i class="fas fa-users"></i>Manajemen User</a></li>
         <li class="nav-item admin-only"><a class="nav-link" onclick="nav('setting', this)"><i class="fas fa-cogs"></i>Settings</a></li>
+        <li class="nav-item"><a class="nav-link text-info fw-bold" onclick="modalUbahProfil()"><i class="fas fa-user-edit"></i>Ubah Profil</a></li>
         <li class="nav-item mt-5"><a class="nav-link text-white" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
       </ul>
     </nav>
@@ -485,7 +486,7 @@ input, button, select, textarea {
     
     <a class="nav-item-mobile text-warning admin-only hide" onclick="nav('verifikasi', this)"><i class="fas fa-clipboard-check"></i><span>Verifikasi</span></a>
     <a class="nav-item-mobile text-info user-only hide" onclick="nav('hasil', this)"><i class="fas fa-file-export"></i><span>Hasil Surat</span></a>
-    <a class="nav-item-mobile text-danger kepsek-only hide" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+    <a class="nav-item-mobile text-primary" onclick="modalUbahProfil()"><i class="fas fa-user-cog"></i><span>Profil</span></a>
 </div>
 </div>
 
@@ -503,7 +504,12 @@ input, button, select, textarea {
                           <div class="mb-2"><label>Ditujukan Kepada</label><input name="ditujukan" id="inTujuanM" class="form-control"></div>
                           <div class="mb-2"><label>Uraian</label><textarea name="uraian" id="inUraianM" class="form-control" rows="2"></textarea></div>
                           <div class="mb-2"><label>Keterangan</label><input name="keterangan" id="inKetM" class="form-control"></div>
-                          <div class="mb-2"><label class="fw-bold">Upload Scan (PDF/IMG/DOC/ZIP Max 500KB)</label><input type="file" id="fileMasuk" class="form-control"></div>
+                          
+                          <div class="d-flex justify-content-between align-items-center mt-2 mb-2">
+                         <label class="fw-bold m-0">Upload File (PDF/IMG Max 500KB)</label>
+                          <button type="button" class="btn btn-sm btn-warning fw-bold shadow-sm" onclick="scanDokumenAI()">
+                          <i class="fas fa-robot me-1"></i> Auto-Fill dengan AI </button></div>
+                          <input type="file" id="fileMasuk" class="form-control">
                       </div>
                       <div id="divKeluar" class="hide">
                           <div class="row mb-2"><div class="col"><label>Tgl Surat</label><input type="date" name="tglSurat" id="inTglSuratK" class="form-control req-out"></div><div class="col"><label>Klasifikasi</label><select name="jenisSurat" id="inJenisK" class="form-select"><option>Surat Dinas/Umum</option><option>Surat Tugas</option><option>Surat Perjalanan Dinas</option><option>Surat Keputusan (SK)</option><option>Surat Pengantar</option><option>Surat Undangan</option><option>Surat Izin</option><option>SPMT</option><option>Nota Dinas</option></select></div></div>
@@ -511,7 +517,12 @@ input, button, select, textarea {
                           <div class="mb-2"><label>Tujuan Surat</label><input name="tujuan" id="inTujuanK" class="form-control"></div>
                           <div class="mb-2"><label>Uraian</label><textarea name="uraian" id="inUraianK" class="form-control" rows="2"></textarea></div>
                           <div class="mb-2"><label>Keterangan</label><input name="keterangan" id="inKetK" class="form-control"></div>
-                          <div class="mb-2"><label class="fw-bold">Upload File (PDF/IMG/DOC/ZIP Max 500KB)</label><input type="file" id="fileKeluar" class="form-control"></div>
+                        
+                          <div class="d-flex justify-content-between align-items-center mt-2 mb-2">
+                         <label class="fw-bold m-0">Upload File (PDF/IMG Max 500KB)</label>
+                          <button type="button" class="btn btn-sm btn-warning fw-bold shadow-sm" onclick="scanDokumenAI()">
+                          <i class="fas fa-robot me-1"></i> Auto-Fill dengan AI </button></div>
+                          <input type="file" id="fileKeluar" class="form-control"></div>
                       </div>
                       <button id="btnSimpan" class="btn btn-primary w-100 mt-3 fw-bold"><span>SIMPAN DATA</span><span class="spinner-border spinner-border-sm hide" role="status"></span></button>
                   </form>
@@ -568,8 +579,8 @@ input, button, select, textarea {
   <script>
   /* --- KONFIGURASI API (URL DARI GOOGLE APPS SCRIPT) --- */
   // NANTI GANTI LINK DI BAWAH INI DENGAN LINK HASIL DEPLOY APPS SCRIPT KAMU
-  const API_URL = "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbzuzx7f57BcaNBoDueHzw0fZVlnJxVVFBk3qG2P7htHy7fvCSF6BPU9OecePsFx8mpp/exec"; 
-  
+  const API_URL = "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbxHz0DVO21aJgGI4kU9XXff8oqSfllV-c_7X4zraxaPJEcWtWKZWx6bzPuOCELkWDYI/exec"; 
+ 
 
   /* --- FUNGSI JEMBATAN PENGHUBUNG (FETCH API) --- */
   async function apiCall(actionName, payloadData = {}) {
@@ -1413,6 +1424,129 @@ function unduhDokumenStaf(id) {
   
   function delUser(u) { if(confirm('Hapus User ini?')) apiCall('deleteUser', {u: u}).then(loadUsers); }
   function modalPrivasi(){ new bootstrap.Modal(document.getElementById('modalPrivasi')).show(); }
+
+ /* --- FUNGSI UBAH PROFIL & PASSWORD --- */
+function toggleSwalPass() {
+    const x = document.getElementById("swal-pwd");
+    const icon = document.getElementById("iconSwalPass");
+    if (x.type === "password") {
+        x.type = "text";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+    } else {
+        x.type = "password";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+    }
+}
+
+function modalUbahProfil() {
+    Swal.fire({
+        title: 'Ubah Profil Akun',
+        html: `
+            <div class="form-floating mb-3 text-start mt-3">
+                <input id="swal-usr" class="form-control" placeholder="Username Baru" value="${localStorage.getItem('sidimas_user')}">
+                <label>Username (Boleh diubah)</label>
+            </div>
+            <div class="input-group mb-2">
+                <div class="form-floating flex-grow-1 text-start">
+                    <input id="swal-pwd" type="password" class="form-control" placeholder="Password Baru">
+                    <label>Password Baru</label>
+                </div>
+                <button class="btn btn-outline-secondary" type="button" onclick="toggleSwalPass()">
+                    <i class="fas fa-eye" id="iconSwalPass"></i>
+                </button>
+            </div>
+            <small class="text-danger text-start d-block fw-bold"><i class="fas fa-info-circle"></i> Kosongkan password jika tidak ingin mengubahnya.</small>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Simpan Perubahan',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#198754',
+        preConfirm: () => {
+            return {
+                newUsername: document.getElementById('swal-usr').value,
+                newPassword: document.getElementById('swal-pwd').value
+            }
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.showLoading();
+            // Memanggil fungsi updateProfile yang sudah Anda pasang di backend GAS
+            apiCall('updateProfile', {
+                oldUsername: localStorage.getItem('sidimas_user'),
+                newUsername: result.value.newUsername,
+                newPassword: result.value.newPassword
+            }).then(r => {
+                if(r.success) {
+                    Swal.fire({
+                        title: 'Berhasil!', 
+                        text: r.message, 
+                        icon: 'success',
+                        allowOutsideClick: false
+                    }).then(() => {
+                        // Paksa user keluar agar login menggunakan password baru
+                        doLogout(); 
+                    });
+                } else {
+                    Swal.fire('Gagal', r.message, 'error');
+                }
+            }).catch(err => {
+                Swal.fire('Error Server', 'Sistem gagal merespon.', 'error');
+            });
+        }
+    });
+}
+
+function scanDokumenAI() {
+    // Tentukan file input mana yang aktif (Surat Masuk atau Keluar)
+    const jenis = $('#mJenis').val();
+    const fileInputId = jenis === 'masuk' ? 'fileMasuk' : 'fileKeluar';
+    const fileInput = document.getElementById(fileInputId);
+    const file = fileInput.files[0];
+
+    if(!file) { 
+        Swal.fire('Info', 'Pilih/Upload file dokumen terlebih dahulu sebelum di-scan AI!', 'warning'); 
+        return; 
+    }
+
+    Swal.fire({
+        title: 'AI Sedang Membaca...',
+        html: 'Mengekstrak teks dari dokumen...<br><span class="spinner-border text-warning mt-3"></span>',
+        allowOutsideClick: false,
+        showConfirmButton: false
+    });
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const base64String = e.target.result.split(',')[1];
+        
+        apiCall('extractSuratAI', { b64: base64String, mimeType: file.type }).then(r => {
+            if(r.success) {
+                Swal.fire('Berhasil!', 'Data otomatis terisi dari dokumen.', 'success');
+                const d = r.data;
+                
+                // Memasukkan data dari AI langsung ke Input Form
+                if(jenis === 'masuk') {
+                    if(d.tglSurat) $('#inTglSuratM').val(d.tglSurat);
+                    if(d.noSurat) $('#inNoSuratM').val(d.noSurat);
+                    if(d.perihal) $('#inPerihalM').val(d.perihal);
+                    if(d.tujuan) $('#inPengirim').val(d.tujuan); // Asumsi pengirim jika surat masuk
+                    if(d.uraian) $('#inUraianM').val(d.uraian);
+                } else {
+                    if(d.tglSurat) $('#inTglSuratK').val(d.tglSurat);
+                    if(d.noSurat) $('#inNoSuratK').val(d.noSurat);
+                    if(d.perihal) $('#inPerihalK').val(d.perihal);
+                    if(d.tujuan) $('#inTujuanK').val(d.tujuan);
+                    if(d.uraian) $('#inUraianK').val(d.uraian);
+                }
+            } else {
+                Swal.fire('AI Gagal', r.message, 'error');
+            }
+        });
+    };
+    reader.readAsDataURL(file);
+}
 </script>
 
 
