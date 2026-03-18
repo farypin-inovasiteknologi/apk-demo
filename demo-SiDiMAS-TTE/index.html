@@ -16,6 +16,8 @@
   <script src="https://code.highcharts.com/highcharts.js"></script>
   <script src="https://code.highcharts.com/modules/exporting.js"></script>
   <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
   
   <style>
     :root { --main-color: #0d6efd; }
@@ -582,6 +584,26 @@ input, button, select, textarea {
 </div>
 <div class="mb-3"><label>Nama Lengkap</label><input name="nama" id="uFull" class="form-control" required></div><button class="btn btn-success w-100">Simpan</button></form></div></div></div></div>
   
+<div class="modal fade" id="modalCrop" tabindex="-1" data-bs-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header bg-primary text-white">
+                  <h5 class="modal-title"><i class="fas fa-crop-alt me-2"></i>Potong Logo (Presisi 1:1)</h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body text-center">
+                  <div style="max-height: 400px; overflow: hidden; background: #eee;">
+                      <img id="imageToCrop" style="max-width: 100%;">
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                  <button type="button" class="btn btn-success fw-bold" id="btnSaveCrop"><i class="fas fa-check"></i> Simpan Potongan</button>
+              </div>
+          </div>
+      </div>
+  </div>
+
   <div class="modal fade" id="modalPrivasi" tabindex="-1">
       <div class="modal-dialog">
           <div class="modal-content">
@@ -914,18 +936,34 @@ input, button, select, textarea {
       }); 
   }
 
-  function simpanSetting(e) { 
-      e.preventDefault(); showLoadingTimer('Menyimpan Pengaturan...'); 
-      Promise.all([resizeImage(document.getElementById('fLogo1').files[0]), resizeImage(document.getElementById('fLogo2').files[0])]).then(imgs=>{ 
-          const fd=new FormData(e.target); const d=Object.fromEntries(fd); 
-          if(imgs[0]) d.b64_instansi=imgs[0]; if(imgs[1]) d.b64_sekolah=imgs[1]; 
-          
-          apiCall('saveSettings', d).then(r => {
-             Swal.close(); 
-             if(r && r.success === false) { Swal.fire('Error', r.message, 'error'); } 
-             else { Swal.fire('Sukses', 'Pengaturan diterapkan', 'success'); loadInitData(); } 
-          }); 
-      }); 
+ function simpanSetting(e) { 
+      e.preventDefault(); 
+      showLoadingTimer('Menyimpan Pengaturan...'); 
+      
+      const fd = new FormData(e.target); 
+      const d = Object.fromEntries(fd); 
+      
+      // Masukkan hasil potongan Cropper.js (jika ada yang dipotong)
+      if(croppedBase64_1) d.b64_instansi = croppedBase64_1; 
+      if(croppedBase64_2) d.b64_sekolah = croppedBase64_2; 
+      
+      apiCall('saveSettings', d).then(r => {
+          Swal.close(); 
+          if(r && r.success === false) { 
+              Swal.fire('Error', r.message, 'error'); 
+          } else { 
+              Swal.fire('Sukses', 'Pengaturan diterapkan', 'success'); 
+              loadInitData(); 
+              
+              // Bersihkan variabel setelah sukses simpan
+              croppedBase64_1 = null; 
+              croppedBase64_2 = null;
+              $('#previewLogo1, #previewLogo2').remove();
+          } 
+      }).catch(err => {
+          Swal.close();
+          Swal.fire('Error', err.toString(), 'error');
+      });
   }
   
   function doBackup() {
@@ -1671,6 +1709,60 @@ function simpanSettingKepsek(e) {
         Swal.fire('Error Server', 'Gagal menyimpan.', 'error');
     });
 }
+
+/* --- FITUR CROPPER.JS UNTUK LOGO SETTINGS --- */
+  let cropper;
+  let currentCropTarget = ''; 
+  let croppedBase64_1 = null; // Menyimpan Base64 Instansi
+  let croppedBase64_2 = null; // Menyimpan Base64 Sekolah
+
+  // Pancingan saat tombol file dipilih
+  $('#fLogo1').on('change', function(e) { openCropper(e, 'logo1'); });
+  $('#fLogo2').on('change', function(e) { openCropper(e, 'logo2'); });
+
+  function openCropper(e, target) {
+      const file = e.target.files[0];
+      if (!file) return;
+      currentCropTarget = target;
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+          $('#imageToCrop').attr('src', event.target.result);
+          new bootstrap.Modal(document.getElementById('modalCrop')).show();
+          
+          if (cropper) cropper.destroy(); // Bersihkan cropper lama jika ada
+          
+          const image = document.getElementById('imageToCrop');
+          cropper = new Cropper(image, {
+              aspectRatio: 1, // KUNCI UTAMA: Memaksa rasio kotak 1:1
+              viewMode: 1,
+              autoCropArea: 0.8,
+          });
+      };
+      reader.readAsDataURL(file);
+      e.target.value = ''; // Reset input file agar bisa diklik lagi jika batal
+  }
+
+  // Aksi saat tombol "Simpan Potongan" diklik
+  $('#btnSaveCrop').click(function() {
+      if (!cropper) return;
+      
+      // Ambil hasil crop, dan paksa kompresi ke ukuran 150x150 pixel saja (Sangat Ringan!)
+      const canvas = cropper.getCroppedCanvas({ width: 150, height: 150 });
+      const base64 = canvas.toDataURL('image/png', 0.8);
+      
+      if (currentCropTarget === 'logo1') {
+          croppedBase64_1 = base64;
+          $('#previewLogo1').remove();
+          $('#fLogo1').after(`<img id="previewLogo1" src="${base64}" class="mt-2 rounded border shadow-sm" style="width:70px; height:70px; object-fit:cover;">`);
+      } else {
+          croppedBase64_2 = base64;
+          $('#previewLogo2').remove();
+          $('#fLogo2').after(`<img id="previewLogo2" src="${base64}" class="mt-2 rounded border shadow-sm" style="width:70px; height:70px; object-fit:cover;">`);
+      }
+      
+      bootstrap.Modal.getInstance(document.getElementById('modalCrop')).hide();
+  });
 
 </script>
 
