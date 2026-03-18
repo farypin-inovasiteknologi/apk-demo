@@ -664,7 +664,7 @@ input, button, select, textarea {
       "sd1": "https://script.google.com/macros/s/LINK_GAS_SD1/exec",
       "smp2": "https://script.google.com/macros/s/LINK_GAS_SMP2/exec",
       "sma3": "https://script.google.com/macros/s/LINK_GAS_SMA3/exec",
-      "demo": "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbz5g4-HND2rCh2pN3Ta6NVV94oPhNLHVhjLociX4GU-vUM73sHAOZm4lUvKXhWMaCw/exec"
+      "demo": "https://script.google.com/a/macros/admin.sma.belajar.id/s/AKfycbzXJE_iNm45vAhFgz9UoOGg-fNMBVCGX2Ay4B3Hb1ime0z340565OISXHK-q5_tn15w/exec"
   };
 
   // Fungsi Deteksi Otomatis
@@ -833,27 +833,34 @@ input, button, select, textarea {
             const params = new URLSearchParams(window.location.search);
             const urlAppId = params.get('app') || localStorage.getItem('sidimas_active_app');
             
-            // 2. Validasi kecocokan ID Database dengan ID URL
+            // 2. VALIDASI SUPER KETAT: Jika identitas DB tidak sama dengan URL, BLOKIR TOTAL!
             if (urlAppId && s.app_identity !== urlAppId) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Konfigurasi Tidak Cocok!',
-                    text: 'Database (' + s.app_identity + ') tidak sesuai dengan ID URL (' + urlAppId + ').',
-                    confirmButtonText: 'Perbaiki Otomatis'
-                }).then(() => {
-                    localStorage.clear();
-                    window.location.href = window.location.origin + window.location.pathname + "?app=" + s.app_identity;
-                });
-                return; // Berhenti jika tidak cocok
+                console.warn("Akses Ilegal: Database tidak cocok dengan URL!");
+                // Hancurkan seluruh antarmuka agar data tidak bisa diakses
+                document.body.innerHTML = `
+                  <div style="text-align:center; padding:50px; font-family:sans-serif; background-color: #f8d7da; min-height: 100vh;">
+                    <h1 style="color:#dc3545; font-size: 3rem; margin-top: 20px;">⚠️ Akses Ditolak</h1>
+                    <h4 style="color:#721c24;">Data Tidak Sinkron!</h4>
+                    <p style="color:#721c24; font-size: 1.2rem;">
+                        URL meminta data untuk instansi <b>${urlAppId.toUpperCase()}</b>,<br>
+                        tetapi link database yang terhubung adalah milik <b>${s.app_identity.toUpperCase()}</b>.
+                    </p>
+                    <hr style="width:50%; margin:20px auto; border-color: #f5c6cb;">
+                    <small style="color:#721c24;">Hubungi Administrator untuk memastikan <b>DATABASE_MAP</b> diatur dengan benar.</small>
+                  </div>`;
+                localStorage.clear(); // Bersihkan memori agar aman
+                return; // Hentikan eksekusi script ke bawah
             }
 
-            // 3. Jika cocok, tampilkan data
+            // 3. Jika aman dan cocok, tampilkan data pengaturan
             renderAppAttributes(s);
         }) 
         .catch(err => {
             console.error("Gagal koneksi:", err);
-            Swal.fire('Koneksi Gagal', 'Tidak bisa terhubung ke Database. Cek Link API di DATABASE_MAP.', 'error');
-        }); // Tanda penutup ini yang sering hilang atau double
+            // Matikan loading di login screen jika error koneksi
+            setBtnLoading('#btnLogin', false, 'Masuk Aplikasi');
+            Swal.fire('Koneksi Terputus', 'Aplikasi gagal menghubungi server Google. Pastikan link di DATABASE_MAP sudah benar.', 'error');
+        }); 
   }
 
   function setBtnLoading(btnId, isLoading, defaultText) {
